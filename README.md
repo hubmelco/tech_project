@@ -1,2 +1,2 @@
-# tech_project
+# <tech_project>
 Revature Technology Project
