@@ -18,8 +18,18 @@ async function runCommand(command) {
     }
 }
 
+function throwIfError(httpStatusCode) {
+    if (httpStatusCode >= 400) {
+        throw {
+            name: 500,
+            message: "Internal Server Error"
+        };
+    }
+}
+
 module.exports = {
     TableName,
     UsernameIndex,
-    runCommand
+    runCommand,
+    throwIfError
 };

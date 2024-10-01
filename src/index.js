@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { register } = require("./services/registerService");
+const { userRouter } = require("./controller/userRouter");
 require("dotenv").config();
 
 //const exampleRouter = require("./controller/example")
@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // Routes
-app.post("/register", register);
+app.use("/user", userRouter);
 
 
 app.listen(PORT, () => console.log("Server listening on http://localhost:3000"));
