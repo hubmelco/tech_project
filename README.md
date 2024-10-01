@@ -1,2 +1,2 @@
-# <tech_project>
+# Movie Review Forum
 Revature Technology Project
