@@ -4,7 +4,9 @@
   "description": "Revature Technology Project Backend",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "start": "node src/index.js",
+    "test": "jest",
+    "dev": "nodemon src/index.js" 
   },
   "author": "",
   "license": "ISC",
