@@ -1,2 +1,2 @@
-# Movie Review Forum
+# Music Review Forum
 Revature Technology Project
