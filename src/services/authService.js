@@ -38,3 +38,8 @@ async function decodeJWT(token){
         console.error(err);
     }
 }
+
+module.exports = {
+    authenticateToken,
+    authenticateAdminToken
+}

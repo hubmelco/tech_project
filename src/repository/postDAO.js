@@ -3,18 +3,10 @@ const { PutCommand } = require("@aws-sdk/lib-dynamodb");
 
 const tableName = "";
 
-async function createPost(username, text, score){
-    if (score < 0 || !text){
-        return 1;
-    }
-    sendPost(username, text, score);
-    return 0;
-}
-
-async function sendPost(username, text, score){
+async function sendPost(username, text, score, title){
     const command = new PutCommand({
         TableName: tableName,
-        Item: {id: uuid.v4(), by: username, desc: text, score}
+        Item: {id: uuid.v4(), by: username, desc: text, score, title}
     });
     try{
         const data = await documentClient.send(command);
@@ -24,4 +16,8 @@ async function sendPost(username, text, score){
         console.error(err);
         return false;
     }
+}
+
+module.exports = {
+    createPost
 }
