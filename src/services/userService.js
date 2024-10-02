@@ -5,7 +5,7 @@ const { createToken } = require('../utilities/jwtUtilities');
 
 async function register(username, password) {
     const rounds = 10;
-    password = await bcrypt.hash(password, rounds);
+    password = bcrypt.hashSync(password, rounds);
 
     const userExists = (await queryByUsername(username)).Count;
     if (userExists) {
@@ -16,13 +16,14 @@ async function register(username, password) {
     }
 
     const result = await putUser(username, password);
-    const statusCode = result?.$metadata.httpStatusCode;
-    throwIfError(statusCode);
+    throwIfError(result);
 }
 
 async function login(username, password) {
-    const user = await queryByUsername(username);
-    if (user && bcrypt.compare(password, user.password)) {
+    const result = await queryByUsername(username);
+    throwIfError(result);
+    const user = result.Items[0];
+    if (user && bcrypt.compareSync(password, user.Password)) {
         return createToken(user);
     }
 
@@ -34,9 +35,8 @@ async function login(username, password) {
 
 async function getUserByUsername(username) {
     const result = await queryByUsername(username);
-    const statusCode = result ? result.$metadata.httpStatusCode : 500;
+    throwIfError(result);
     const foundUser = result?.Item;
-    throwIfError(statusCode);
     return foundUser;
 }
 

@@ -18,8 +18,9 @@ async function runCommand(command) {
     }
 }
 
-function throwIfError(httpStatusCode) {
-    if (httpStatusCode >= 400) {
+function throwIfError(result) {
+    const statusCode = result ? result.$metadata.httpStatusCode : 500;
+    if (statusCode >= 400) {
         throw {
             name: 500,
             message: "Internal Server Error"
