@@ -1,7 +1,7 @@
 const uuid = require("uuid");
 const { PutCommand } = require("@aws-sdk/lib-dynamodb");
 
-const tableName = "";
+const tableName = "Technology_Project";
 
 async function sendPost(username, text, score, title){
     const command = new PutCommand({

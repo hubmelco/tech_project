@@ -1,6 +1,6 @@
 const { ScanCommand } = require("@aws-sdk/client-dynamodb");
 
-const tableName = "";
+const tableName = "Technology_Project";
 let key = "";
 fs.readFile('./src/key.txt', (err, data) => {
     if (err) throw err;
