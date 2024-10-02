@@ -1,7 +1,17 @@
+const { ScanCommand } = require("@aws-sdk/client-dynamodb");
+const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
 
+let key = "";
+fs.readFile('./src/key.txt', (err, data) => {
+    if (err) throw err;
+    key = data.toString();
+});
+
+const tableName = "";
+
 async function login(username, password){
-    const user = queryUser(username);
+    const user = findUser(username);
     if (user){
         if (bcrypt.compare(password, user.password)){
             return createToken(user);
@@ -24,4 +34,25 @@ async function createToken(user){
         }
     );
     return token;
+}
+
+async function findUser(username){
+    const command = new ScanCommand({
+        TableName: tableName,
+        FilterExpression: "#username = :username",
+        ExpressionAttributeNames: {
+            "#username": "username"
+        },
+        ExpressionAttributeValues: {
+            ":username": {S: username}
+        }
+    })
+    try{
+        const data = await documentClient.send(command);
+        return data.Items[0];
+    }
+    catch(err){
+        console.error(err);
+        return false;
+    }
 }
