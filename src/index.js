@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // Routes
-app.use("/user", userRouter);
+app.use("/users", userRouter);
 
 
 app.listen(PORT, () => console.log("Server listening on http://localhost:3000"));

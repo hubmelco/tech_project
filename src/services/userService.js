@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const { putUser, queryByUsername } = require('../repository/userDAO');
 const { throwIfError } = require('../utilities/dynamoUtilities');
+const { createToken } = require('../utilities/jwtUtilities');
 
 async function register(username, password) {
     const rounds = 10;
@@ -19,6 +20,18 @@ async function register(username, password) {
     throwIfError(statusCode);
 }
 
+async function login(username, password) {
+    const user = await queryByUsername(username);
+    if (user && bcrypt.compare(password, user.password)) {
+        return createToken(user);
+    }
+
+    throw {
+        name: 400,
+        message: "Invalid username/password"
+    }
+}
+
 async function getUserByUsername(username) {
     const result = await queryByUsername(username);
     const statusCode = result ? result.$metadata.httpStatusCode : 500;
@@ -29,5 +42,6 @@ async function getUserByUsername(username) {
 
 module.exports = {
     register,
+    login,
     getUserByUsername
 };
