@@ -1,18 +1,17 @@
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
-let key = "";
-fs.readFile('./key.txt', (err, data) => {
-    if (err) throw err;
-    key = data.toString();
-});
-
 function findToken(req){
     const authHeader = req.headers["authorization"];
     return (authHeader && authHeader.split(" ")[1]);
 }
 
 function createToken(user) {
+    let key = "";
+    fs.readFile('./key.txt', (err, data) => {
+        if (err) throw err;
+        key = data.toString();
+    });
     const token = jwt.sign(
         {
             ItemID: user.ItemID,

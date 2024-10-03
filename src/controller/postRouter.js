@@ -7,10 +7,10 @@ const { validateTextBody, validateScore } = require('../middleware/postMiddlewar
 
 const postRouter = express.Router();
 
-postRouter.post("/create", authenticateToken, validateTextBody, validateScore, async (req, res) => {
+postRouter.post("/", authenticateToken, validateTextBody, validateScore, async (req, res) => {
     //TODO check song title exists in API
     try {
-        await createPost(req.user.Username, req.body.Text, req.body.Score, req.body.Title);
+        await createPost(req.User.Username, req.body.Text, req.body.Score, req.body.Title);
         res.status(201).json({
             messge: "Post successfully created"
         });
