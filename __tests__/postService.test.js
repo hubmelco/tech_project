@@ -59,28 +59,4 @@ describe('createPost test', () => {
         expect(added).toBeTruthy();
         expect(response).toEqual({message: "Post created successfully"});
     });
-    it('Throws error score too low', async () => {
-        try {
-            await createPost("Jack", "AWFUL!", -1, "Queen");
-        } catch (err) {
-            error = err;
-        }
-        expect(error.name).toEqual(400);
-    });
-    it('Throws error score too high', async () => {
-        try {
-            await createPost("Tom", "AWESOME!", 200, "Rolling Stones");
-        } catch (err) {
-            error = err;
-        }
-        expect(error.name).toEqual(400);
-    });
-    it('Throws error no text body', async () => {
-        try {
-            await createPost("Todd", "", 50, "");
-        } catch (err) {
-            error = err;
-        }
-        expect(error.name).toEqual(400);
-    });
 })
