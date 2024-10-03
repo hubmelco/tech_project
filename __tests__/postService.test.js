@@ -1,5 +1,5 @@
-const { createPost } = require("./src/services/postService");
-const { sendPost } = require("./src/repository/postDAO");
+const { createPost } = require("../src/services/postService");
+const { sendPost } = require("../src/repository/postDAO");
 
 describe('createPost test', () => {
     it('Create post by Sam on Metallica with a 69 score', async () => {

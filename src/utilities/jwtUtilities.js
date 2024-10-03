@@ -2,10 +2,15 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 
 let key = "";
-fs.readFile('../key.txt', (err, data) => {
+fs.readFile('./key.txt', (err, data) => {
     if (err) throw err;
     key = data.toString();
 });
+
+function findToken(req){
+    const authHeader = req.headers["authorization"];
+    return (authHeader && authHeader.split(" ")[1]);
+}
 
 function createToken(user) {
     const token = jwt.sign(
@@ -34,5 +39,6 @@ function decodeJWT(token) {
 
 module.exports = {
     createToken,
-    decodeJWT
+    decodeJWT,
+    findToken
 };

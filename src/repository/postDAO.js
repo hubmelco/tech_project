@@ -1,23 +1,15 @@
 const uuid = require("uuid");
 const { PutCommand } = require("@aws-sdk/lib-dynamodb");
-
-const tableName = "Technology_Project";
+const { TableName, runCommand } = require('../utilities/dynamoUtilities');
 
 async function sendPost(username, text, score, title){
     const command = new PutCommand({
-        TableName: tableName,
+        TableName: TableName,
         Item: {id: uuid.v4(), by: username, desc: text, score, title}
     });
-    try{
-        const data = await documentClient.send(command);
-        return data;
-    }
-    catch(err){
-        console.error(err);
-        return false;
-    }
+    return await runCommand(command);
 }
 
 module.exports = {
-    createPost
-}
+    sendPost
+};
