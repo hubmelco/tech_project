@@ -1,7 +1,11 @@
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
-// TODO: move key to a secure location
-const key = "0254b269-06b1-4dbb-8eb8-1e46cfdfc257";
+let key = "";
+fs.readFile('../key.txt', (err, data) => {
+    if (err) throw err;
+    key = data.toString();
+});
 
 function createToken(user) {
     const token = jwt.sign(

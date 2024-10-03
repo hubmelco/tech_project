@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const fs = require('fs');
+const { decodeJWT } = require('../utilities/jwtUtilities');
 
 async function authenticateToken(req, res, next){
     const authHeader = req.headers["authorization"];
@@ -8,7 +9,7 @@ async function authenticateToken(req, res, next){
         res.status(401).json({message: "You must sign in first"});
     }
     else{
-        req.user = await decodeJWT(token);
+        req.user = decodeJWT(token);
         next();
     }
 }
@@ -20,22 +21,13 @@ async function authenticateAdminToken(req, res, next){
         res.status(401).json({message: "You must sign in first"});
     }
     else{
-        const user = await decodeJWT(token);
+        const user = decodeJWT(token);
         if (!user || user.role !== "Admin"){
             res.status(403).json({message: "Admin only access"});
             return;
         }
         req.user = user;
         next();
-    }
-}
-
-async function decodeJWT(token){
-    try{
-        const user = jwt.verify(token, key)
-        return user;
-    }catch(err){
-        console.error(err);
     }
 }
 
