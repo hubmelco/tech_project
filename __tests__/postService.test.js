@@ -27,7 +27,7 @@ beforeAll(() => {
         mockDatabase.set(Username, newPost);
         return {
             $metadata: {
-                httpStatusCode: 201
+                httpStatusCode: 200
             }
         };
     });
@@ -58,16 +58,28 @@ describe('createPost test', () => {
         expect(added).toBeTruthy();
         expect(response).toEqual({message: "Post created successfully"});
     });
-    it('Score too low', async () => {
-        const response = await createPost("Jack", "AWFUL!", -1, "Queen");
-        expect(response).toEqual({message: "Invalid post"});
+    it('Throws error score too low', async () => {
+        try {
+            await createPost("Jack", "AWFUL!", -1, "Queen");
+        } catch (err) {
+            error = err;
+        }
+        expect(error.name).toEqual(400);
     });
-    it('Score too high', async () => {
-        const response = await createPost("Tom", "AWESOME!", 200, "Rolling Stones");
-        expect(response).toEqual({message: "Invalid post"});
+    it('Throws error score too high', async () => {
+        try {
+            await createPost("Tom", "AWESOME!", 200, "Rolling Stones");
+        } catch (err) {
+            error = err;
+        }
+        expect(error.name).toEqual(400);
     });
-    it('No text body', async () => {
-        const response = await createPost("Todd", "", 50, "");
-        expect(response).toEqual({message: "Invalid post"});
+    it('Throws error no text body', async () => {
+        try {
+            await createPost("Todd", "", 50, "");
+        } catch (err) {
+            error = err;
+        }
+        expect(error.name).toEqual(400);
     });
 })
