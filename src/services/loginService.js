@@ -1,9 +1,15 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
-const { findUser } = require('./src/repository/userDAO');
+const { queryByUsername } = require('./src/repository/userDAO');
+
+let key = "";
+fs.readFile('./key.txt', (err, data) => {
+    if (err) throw err;
+    key = data.toString();
+});
 
 async function login(username, password){
-    const user = findUser(username);
+    const user = queryByUsername(username);
     if (user){
         if (bcrypt.compare(password, user.password)){
             return createToken(user);
