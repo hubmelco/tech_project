@@ -1,5 +1,6 @@
 const { createPost } = require("../src/services/postService");
 const { sendPost } = require("../src/repository/postDAO");
+const postDAO = require("../src/repository/postDAO");
 const uuid = require('uuid');
 
 jest.mock('../src/repository/postDAO');
