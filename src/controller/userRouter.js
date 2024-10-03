@@ -1,4 +1,5 @@
 const express = require('express');
+const { handleServiceError } = require('../utilities/routerUtilities');
 const { register, login } = require('../services/userService');
 const { validateUsername, validatePassword } = require('../middleware/userMiddleware');
 
@@ -32,21 +33,6 @@ userRouter.post("/login", validateUsername, validatePassword, async (req, res) =
         handleServiceError(err, res);
     }
 });
-
-function handleServiceError(error, res) {
-    console.error(error);
-
-    let statusCode = error.name;
-    let message = error.message;
-    if (typeof error.name != "number") {
-        statusCode = 500;
-        message = "Internal Server Error";
-    }
-
-    res.status(statusCode).json({
-        message
-    });
-}
 
 module.exports = {
     userRouter
