@@ -7,7 +7,7 @@ const authenticate = (req, res, next) => {
         return res.status(401).json("Unauthorized Access");
     }
     try {
-        const user = jwt.verify(token. process.env.JWT_SECRET);
+        const user = jwt.verify(token, process.env.JWT_SECRET);
         res.locals.user = user;
         next();
     } catch (err) {
