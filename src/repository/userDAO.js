@@ -1,38 +1,46 @@
-const uuid = require('uuid');
-const { PutCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, QueryCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 const { TableName, UsernameIndex, runCommand } = require('../utilities/dynamoUtilities');
 
+const CLASS = "user";
 
-async function putUser(Username, Password) {
-    const ItemID = uuid.v4();
-
+async function putUser(Item) {
     const command = new PutCommand({
         TableName,
-        Item: {
-            ItemID,
-            Username,
-            Password
-        },
-        ConditionExpression: "attribute_not_exists(ItemID)"
+        Item,
+        ConditionExpression: "attribute_not_exists(itemID)"
     });
     const response = await runCommand(command);
     return response;
 }
 
-async function queryByUsername(Username) {
+async function queryByUsername(username) {
     const command = new QueryCommand({
         TableName,
         IndexName: UsernameIndex,
-        KeyConditionExpression: "Username = :Username",
+        KeyConditionExpression: "#class = :class AND #username = :username",
+        ExpressionAttributeNames: {
+            "#class": "class",
+            "#username": "username"
+        },
         ExpressionAttributeValues: {
-            ":Username": Username
+            ":username": username,
+            ":class": CLASS
         }
     });
     const response = await runCommand(command);
     return response;
 }
 
+const deleteUser = async (id) => {
+    const command = new DeleteCommand({
+        TableName,
+        Key: {class: CLASS, itemID: id}
+    })
+    await runCommand(command);
+}
+
 module.exports = {
     putUser,
-    queryByUsername
+    queryByUsername,
+    deleteUser
 };

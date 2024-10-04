@@ -1,6 +1,7 @@
 const express = require('express');
-const { register, login } = require('../services/userService');
+const { register, login, deleteUser } = require('../services/userService');
 const { validateUsername, validatePassword } = require('../middleware/userMiddleware');
+const {adminAuthenticate} = require("../middleware/auth");
 
 const userRouter = express.Router();
 
@@ -9,9 +10,10 @@ userRouter.post("/", validateUsername, validatePassword, async (req, res) => {
     const password = req.body.password;
 
     try {
-        await register(username, password);
+        const data = await register(username, password);
         res.status(201).json({
-            messge: "User successfully registered"
+            message: "User successfully registered",
+            data
         });
     } catch (err) {
         handleServiceError(err, res);
@@ -33,19 +35,25 @@ userRouter.post("/login", validateUsername, validatePassword, async (req, res) =
     }
 });
 
+userRouter.delete("/:id", adminAuthenticate, async (req, res) => {
+    const {id} = req.params;
+    try {
+        await deleteUser(id);
+        return res.status(200).json({message: "Deleted user", data: id});
+    } catch (err) {
+        handleServiceError(err, res);
+    }
+})
+
 function handleServiceError(error, res) {
     console.error(error);
 
-    let statusCode = error.name;
-    let message = error.message;
-    if (typeof error.name != "number") {
-        statusCode = 500;
-        message = "Internal Server Error";
+    const statusCode = error.status;
+    if (!statusCode) {
+        return res.status(500).json({message: "Internal Server error"})
     }
-
-    res.status(statusCode).json({
-        message
-    });
+    const message = error.message;
+    return res.status(statusCode).json({message});
 }
 
 module.exports = {
