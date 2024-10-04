@@ -6,11 +6,14 @@ function findToken(req){
     return (authHeader && authHeader.split(" ")[1]);
 }
 
-function createToken(user) {
-    const key = fs.readFileSync('./key.txt', (err, data) => {
+function getKey(){
+    return fs.readFileSync('./key.txt', (err, data) => {
         if (err) throw err;
         return data.toString();
     });
+}
+
+function createToken(user) {
     const token = jwt.sign(
         {
             ItemID: user.ItemID,
@@ -18,7 +21,7 @@ function createToken(user) {
             Role: user.Role,
             Favorites: user.Favorites
         },
-        key,
+        getKey(),
         {
             expiresIn: "50m"
         }
@@ -28,11 +31,7 @@ function createToken(user) {
 
 function decodeJWT(token) {
     try {
-        const key = fs.readFileSync('./key.txt', (err, data) => {
-            if (err) throw err;
-            return data.toString();
-        });
-        const user = jwt.verify(token, key);
+        const user = jwt.verify(token, getKey());
         return user;
     } catch (err) {
         console.error(err);
