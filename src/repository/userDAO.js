@@ -1,30 +1,19 @@
-const uuid = require('uuid');
-const { PutCommand, QueryCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, QueryCommand, UpdateCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
 const { TableName, UsernameIndex, runCommand } = require('../utilities/dynamoUtilities');
 
 const CLASS = "user";
 
-async function putUser(username, password) {
-    const itemID = uuid.v4();
-
+async function putUser(Item) {
     const command = new PutCommand({
         TableName,
-        Item: {
-            class: CLASS,
-            itemID,
-            username,
-            password,
-            bio: "",
-            genres: []
-        },
-        ConditionExpression: "attribute_not_exists(ItemID)"
+        Item,
+        ConditionExpression: "attribute_not_exists(itemID)"
     });
     const response = await runCommand(command);
     return response;
 }
 
 async function queryByUsername(username) {
-    const UsernameIndex = "username-index";
     const command = new QueryCommand({
         TableName,
         IndexName: UsernameIndex,
@@ -78,14 +67,22 @@ async function updateUser(userId, requestBody) {
         },
         ReturnValues: "ALL_NEW"
     });
-    
     const response = await runCommand(command);
     return response;
+}
+
+const deleteUser = async (id) => {
+    const command = new DeleteCommand({
+        TableName,
+        Key: {class: CLASS, itemID: id}
+    })
+    await runCommand(command);
 }
 
 module.exports = {
     putUser,
     queryById,
     queryByUsername,
-    updateUser
+    updateUser,
+    deleteUser
 };
