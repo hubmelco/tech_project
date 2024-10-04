@@ -3,15 +3,16 @@ const { PutCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { TableName, UsernameIndex, runCommand } = require('../utilities/dynamoUtilities');
 
 
-async function putUser(Username, Password) {
-    const ItemID = uuid.v4();
+async function putUser(username, password) {
+    const itemID = uuid.v4();
 
     const command = new PutCommand({
         TableName,
         Item: {
-            ItemID,
-            Username,
-            Password
+            class: "user",
+            itemID,
+            username,
+            password
         },
         ConditionExpression: "attribute_not_exists(ItemID)"
     });
@@ -22,7 +23,7 @@ async function putUser(Username, Password) {
 async function queryByUsername(Username) {
     const command = new QueryCommand({
         TableName,
-        IndexName: UsernameIndex,
+        IndexName: "username-index",
         KeyConditionExpression: "Username = :Username",
         ExpressionAttributeValues: {
             ":Username": Username
