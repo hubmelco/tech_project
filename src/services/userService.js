@@ -21,6 +21,8 @@ async function register(username, password) {
     }
     const result = await userDAO.putUser(user);
     throwIfError(result);
+    delete(user.password);
+    return user;
 }
 
 async function login(username, password) {

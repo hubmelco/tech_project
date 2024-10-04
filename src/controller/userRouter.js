@@ -10,9 +10,10 @@ userRouter.post("/", validateUsername, validatePassword, async (req, res) => {
     const password = req.body.password;
 
     try {
-        await register(username, password);
+        const data = await register(username, password);
         res.status(201).json({
-            messge: "User successfully registered"
+            message: "User successfully registered",
+            data
         });
     } catch (err) {
         handleServiceError(err, res);
