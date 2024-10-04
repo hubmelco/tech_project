@@ -1,16 +1,12 @@
 function handleServiceError(error, res) {
     console.error(error);
 
-    let statusCode = error.name;
-    let message = error.message;
-    if (typeof error.name != "number") {
-        statusCode = 500;
-        message = "Internal Server Error";
+    const statusCode = error.status;
+    if (!statusCode) {
+        return res.status(500).json({message: "Internal Server error"})
     }
-
-    res.status(statusCode).json({
-        message
-    });
+    const message = error.message;
+    return res.status(statusCode).json({message});
 }
 
 module.exports = {
