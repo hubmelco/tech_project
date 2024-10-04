@@ -7,10 +7,9 @@ function findToken(req){
 }
 
 function createToken(user) {
-    let key = "";
-    fs.readFile('./key.txt', (err, data) => {
+    const key = fs.readFileSync('./key.txt', (err, data) => {
         if (err) throw err;
-        key = data.toString();
+        return data.toString();
     });
     const token = jwt.sign(
         {
@@ -29,6 +28,10 @@ function createToken(user) {
 
 function decodeJWT(token) {
     try {
+        const key = fs.readFileSync('./key.txt', (err, data) => {
+            if (err) throw err;
+            return data.toString();
+        });
         const user = jwt.verify(token, key);
         return user;
     } catch (err) {

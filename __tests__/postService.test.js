@@ -4,7 +4,7 @@ const postDAO = require("../src/repository/postDAO");
 const uuid = require('uuid');
 
 jest.mock('../src/repository/postDAO');
-const mockDatabase = [];
+let mockDatabase = [];
 const mockPost1 = {
     ItemID: "e7b1998e-77d3-4cad-9955-f20135d840d0 ",
     Username: "user_1",
@@ -25,7 +25,7 @@ beforeAll(() => {
     postDAO.sendPost.mockImplementation(async (Username, Text, Score, Title) => {
         const newPost = { ItemID: uuid.v4(), Username, Text, Score, Title };
 
-        mockDatabase.set(Username, newPost);
+        mockDatabase.push(newPost);
         return {
             $metadata: {
                 httpStatusCode: 200
@@ -36,7 +36,7 @@ beforeAll(() => {
 
 beforeEach(() => {
     // Reset database
-    mockDatabase.clear();
+    mockDatabase = [];
     mockDatabase.push(mockPost1);
     mockDatabase.push(mockPost2);
     postDAO.sendPost.mockClear();
