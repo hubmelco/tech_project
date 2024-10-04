@@ -24,7 +24,6 @@ beforeAll(() => {
     // Mock postDAO
     postDAO.sendPost.mockImplementation(async (Username, Text, Score, Title) => {
         const newPost = { ItemID: uuid.v4(), Username, Text, Score, Title };
-
         mockDatabase.push(newPost);
         return {
             $metadata: {
