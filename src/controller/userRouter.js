@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login } = require('../services/userService');
+const userService = require('../services/userService');
 const { validateUsername, validatePassword } = require('../middleware/userMiddleware');
 
 const userRouter = express.Router();
@@ -9,9 +9,9 @@ userRouter.post("/", validateUsername, validatePassword, async (req, res) => {
     const password = req.body.password;
 
     try {
-        await register(username, password);
+        await userService.register(username, password);
         res.status(201).json({
-            messge: "User successfully registered"
+            message: "User successfully registered"
         });
     } catch (err) {
         handleServiceError(err, res);
@@ -23,11 +23,23 @@ userRouter.post("/login", validateUsername, validatePassword, async (req, res) =
     const password = req.body.password;
 
     try {
-        const token = await login(username, password);
+        const token = await userService.login(username, password);
         res.status(200).json({
             token,
             message: "Successfully logged in"
         });
+    } catch (err) {
+        handleServiceError(err, res);
+    }
+});
+
+userRouter.put("/:userId", async (req, res) => {
+    const userId = req.params.userId;
+    const requestBody = req.body;
+
+    try {
+        const updatedUser = await userService.updateUser(userId, requestBody);
+        res.status(200).json({message: "User has been updated", updatedUser});
     } catch (err) {
         handleServiceError(err, res);
     }
