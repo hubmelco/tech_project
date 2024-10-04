@@ -1,7 +1,6 @@
 const express = require('express');
 const { createPost } = require('../services/postService');
 const { handleServiceError } = require('../utilities/routerUtilities');
-const jwt = require("jsonwebtoken");
 const { authenticate } = require("../middleware/authMiddleware");
 const { validateTextBody, validateScore } = require('../middleware/postMiddleware');
 
