@@ -47,7 +47,7 @@ async function getUserByUsername(username) {
 }
 
 async function getUserById(userId) {
-    const result = await userDao.queryById(userId);
+    const result = await userDAO.queryById(userId);
     throwIfError(result);
     const foundUser = result?.Items[0];
     return foundUser;
@@ -66,7 +66,7 @@ async function updateUser(userId, requestBody) {
         requestBody.genres = foundUser.genres;
     }
 
-    const result = await userDao.updateUser(userId, requestBody);
+    const result = await userDAO.updateUser(userId, requestBody);
     throwIfError(result);
     const updatedUser = result?.Attributes;
     return updatedUser;

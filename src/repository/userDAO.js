@@ -23,8 +23,8 @@ async function queryByUsername(username) {
             "#username": "username"
         },
         ExpressionAttributeValues: {
+            ":username": username,
             ":class": CLASS,
-            ":username": username
         }
     });
     const response = await runCommand(command);
