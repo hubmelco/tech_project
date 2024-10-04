@@ -20,13 +20,19 @@ async function putUser(username, password) {
     return response;
 }
 
-async function queryByUsername(Username) {
+async function queryByUsername(username) {
+    const UsernameIndex = "username-index";
     const command = new QueryCommand({
         TableName,
-        IndexName: "username-index",
-        KeyConditionExpression: "Username = :Username",
+        IndexName: UsernameIndex,
+        KeyConditionExpression: "#class = :class AND #username = :username",
+        ExpressionAttributeNames: {
+            "#class": "class",
+            "#username": "username"
+        },
         ExpressionAttributeValues: {
-            ":Username": Username
+            ":username": username,
+            ":class": "user"
         }
     });
     const response = await runCommand(command);
