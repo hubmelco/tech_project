@@ -24,7 +24,7 @@ async function queryByUsername(username) {
         },
         ExpressionAttributeValues: {
             ":username": username,
-            ":class": CLASS,
+            ":class": CLASS
         }
     });
     const response = await runCommand(command);
