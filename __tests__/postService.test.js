@@ -21,7 +21,7 @@ const mockPost2 = {
 };
 
 beforeAll(() => {
-    // Mock postDAO
+    // Mock postDAO here
     postDAO.sendPost.mockImplementation(async (Username, Text, Score, Title) => {
         const newPost = { ItemID: uuid.v4(), Username, Text, Score, Title };
         mockDatabase.push(newPost);
