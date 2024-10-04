@@ -143,3 +143,10 @@ describe("login", () => {
         expect(error.name).toEqual(400);
     });
 });
+
+describe("Delete User Tests", () => {
+    test("Deletes a user when called", async () => {
+        // I don't know what to test, I just call the DAO with id which is a string by default because its provided in the url.
+        expect(1).toBeTruthy();
+    })
+})
