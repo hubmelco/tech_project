@@ -39,7 +39,7 @@ userRouter.delete("/:id", adminAuthenticate, async (req, res) => {
     const {id} = req.params;
     try {
         await deleteUser(id);
-        return res.status(200).json({message: `Deleted user with id ${id}`});
+        return res.status(200).json({message: "Deleted user", data: id});
     } catch (err) {
         handleServiceError(err, res);
     }
