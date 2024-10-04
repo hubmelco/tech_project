@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const { PutCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { TableName, UsernameIndex, runCommand } = require('../utilities/dynamoUtilities');
 
+const CLASS = "user";
 
 async function putUser(username, password) {
     const itemID = uuid.v4();
@@ -9,7 +10,7 @@ async function putUser(username, password) {
     const command = new PutCommand({
         TableName,
         Item: {
-            class: "user",
+            class: CLASS,
             itemID,
             username,
             password
@@ -32,7 +33,7 @@ async function queryByUsername(username) {
         },
         ExpressionAttributeValues: {
             ":username": username,
-            ":class": "user"
+            ":class": CLASS
         }
     });
     const response = await runCommand(command);

@@ -23,7 +23,7 @@ async function login(username, password) {
     const result = await queryByUsername(username);
     throwIfError(result);
     const user = result.Items[0];
-    if (user && bcrypt.compareSync(password, user.Password)) {
+    if (user && bcrypt.compareSync(password, user.password)) {
         return createToken(user);
     }
 
