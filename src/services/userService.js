@@ -47,9 +47,9 @@ async function getUserByUsername(username) {
 }
 
 async function getUserById(userId) {
-    const result = await userDAO.queryById(userId);
+    const result = await userDAO.getUserById(userId);
     throwIfError(result);
-    const foundUser = result?.Items[0];
+    const foundUser = result?.Item;
     return foundUser;
 }
 

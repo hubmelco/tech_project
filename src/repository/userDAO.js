@@ -1,4 +1,4 @@
-const { PutCommand, QueryCommand, UpdateCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const { PutCommand, QueryCommand, UpdateCommand, DeleteCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
 const { TableName, UsernameIndex, runCommand } = require('../utilities/dynamoUtilities');
 
 const CLASS = "user";
@@ -31,16 +31,12 @@ async function queryByUsername(username) {
     return response;
 }
 
-async function queryById(userId) {
-    const command = new QueryCommand({
+async function getUserById(userId) {
+    const command = new GetCommand({
         TableName,
-        KeyConditionExpression: "#class = :class AND itemID = :itemID",
-        ExpressionAttributeNames: {
-            "#class": "class"
-        },
-        ExpressionAttributeValues: {
-            ":class": CLASS,
-            ":itemID": userId
+        Key: {
+            class: CLASS,
+            itemID: userId
         }
     });
     const response = await runCommand(command);
@@ -81,8 +77,8 @@ const deleteUser = async (id) => {
 
 module.exports = {
     putUser,
-    queryById,
     queryByUsername,
+    getUserById,
     updateUser,
     deleteUser
 };
