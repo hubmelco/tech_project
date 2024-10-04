@@ -10,10 +10,8 @@ const postRouter = express.Router();
 
 postRouter.post("/", authenticate, validateTextBody, validateScore, async (req, res) => {
     //TODO check song title exists in API
-    const token = req.headers?.authorization && req.headers.authorization.split(" ")[1];
-    const username = jwt.verify(token, process.env.JWT_SECRET).username;
     try {
-        await createPost(username, req.body.text, req.body.score, req.body.title);
+        await createPost(res.locals.user.username, req.body.text, req.body.score, req.body.title);
         res.status(200).json({
             messge: "Post successfully created"
         });
