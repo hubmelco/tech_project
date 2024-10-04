@@ -1,9 +1,7 @@
-const { isValidString } = require("../utilities/stringUtilities");
-
 function validateTextBody(req, res, next) {
-    const desc = req.body.Text;
+    const desc = req.body.text;
 
-    if(!isValidString(desc)) {
+    if(!desc) {
         res.status(400).json({
             message: "Invalid post text"
         });
@@ -13,9 +11,9 @@ function validateTextBody(req, res, next) {
 }
 
 function validateScore(req, res, next) {
-    const score = req.body.Score;
+    const score = req.body.score;
 
-    if(!isNaN(score) || score < 0 || score > 100) {
+    if(isNaN(score) || score < 0 || score > 100) {
         res.status(400).json({
             message: "Invalid score"
         });
