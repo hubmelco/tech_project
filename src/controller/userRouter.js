@@ -36,9 +36,6 @@ userRouter.post("/login", validateUsername, validatePassword, async (req, res) =
 
 userRouter.delete("/:id", adminAuthenticate, async (req, res) => {
     const {id} = req.params;
-    if (!id) {
-        return res.status(400).json({message: "id required as a param"});
-    }
     try {
         await deleteUser(id);
         return res.status(200).json({message: `Deleted user with id ${id}`});
