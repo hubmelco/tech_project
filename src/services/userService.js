@@ -1,16 +1,16 @@
 const bcrypt = require('bcrypt');
 const uuid = require("uuid");
 const jwt = require("jsonwebtoken");
-const userDAO  = require('../repository/userDAO');
+const userDAO = require('../repository/userDAO');
 const { throwIfError } = require('../utilities/dynamoUtilities');
 
-async function register(username, password) {
+const register = async (username, password) => {
     const rounds = 10;
     password = bcrypt.hashSync(password, rounds);
 
     const userExists = (await userDAO.queryByUsername(username)).Count;
     if (userExists) {
-        throw {status: 400, message: "Username already taken"};
+        throw { status: 400, message: "Username already taken" };
     }
     const user = {
         class: "user",
@@ -21,11 +21,11 @@ async function register(username, password) {
     }
     const result = await userDAO.putUser(user);
     throwIfError(result);
-    delete(user.password);
+    delete (user.password);
     return user;
 }
 
-async function login(username, password) {
+const login = async (username, password) => {
     const result = await userDAO.queryByUsername(username);
     throwIfError(result);
     const user = result.Items[0];
@@ -39,7 +39,7 @@ async function login(username, password) {
     }
 }
 
-async function getUserByUsername(username) {
+const getUserByUsername = async (username) => {
     const result = await userDAO.queryByUsername(username);
     throwIfError(result);
     const foundUser = result?.Item;
@@ -53,9 +53,9 @@ const deleteUser = async (id) => {
 
 function createToken(user) {
     // Delete unneccesarry attributes as needed here
-    delete(user.password);
+    delete (user.password);
 
-    const token = jwt.sign(user, process.env.JWT_SECRET, {expiresIn: "1d"});
+    const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1d" });
     return token;
 }
 
