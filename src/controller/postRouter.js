@@ -13,7 +13,7 @@ postRouter.post("/", authenticate, validateTextBody, validateScore, async (req, 
     try {
         await createPost(res.locals.user.username, req.body.text, req.body.score, req.body.title);
         res.status(200).json({
-            messge: "Post successfully created"
+            message: "Post successfully created"
         });
     } catch (err) {
         handleServiceError(err, res);
