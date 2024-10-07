@@ -19,6 +19,16 @@ postRouter.post("/", authenticate, validateTextBody, validateScore, async (req, 
     }
 });
 
+postRouter.delete("/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+        await deletePost(id);
+        return res.status(200).json({ message: "Deleted post", data: id });
+    } catch (err) {
+        handleServiceError(err, res);
+    }
+});
+
 module.exports = {
     postRouter
 };
