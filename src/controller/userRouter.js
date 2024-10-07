@@ -1,7 +1,8 @@
 const express = require('express');
 const userService = require('../services/userService');
 const { validateUsername, validatePassword } = require('../middleware/userMiddleware');
-const { authenticate, adminAuthenticate } = require("../middleware/auth");
+const {  authenticate, adminAuthenticate  } = require("../middleware/authMiddleware");
+const { handleServiceError } = require("../utilities/routerUtilities");
 
 const userRouter = express.Router();
 
@@ -60,17 +61,6 @@ userRouter.delete("/:id", adminAuthenticate, async (req, res) => {
         handleServiceError(err, res);
     }
 })
-
-function handleServiceError(error, res) {
-    console.error(error);
-
-    const statusCode = error.status;
-    if (!statusCode) {
-        return res.status(500).json({message: "Internal Server error"})
-    }
-    const message = error.message;
-    return res.status(statusCode).json({message});
-}
 
 module.exports = {
     userRouter
