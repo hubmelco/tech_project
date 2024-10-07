@@ -49,7 +49,7 @@ userRouter.patch("/:id/role", validateRole, adminAuthenticate, async (req, res) 
     const { role } = req.body;
     try {
         await updateRole(id, role);
-        return res.status(200).json({ message: `User role changed to ${role}`, data: id });
+        return res.status(200).json({ message: `User role changed to ${role}` });
     } catch (err) {
         handleServiceError(err, res);
     }
