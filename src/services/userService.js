@@ -39,11 +39,32 @@ const login = async (username, password) => {
     }
 }
 
-const getUserByUsername = async (username) => {
-    const result = await userDAO.queryByUsername(username);
+const updateRole = async (id, role) => {
+    let result = await userDAO.getUserById(id);
     throwIfError(result);
-    const foundUser = result?.Item;
-    return foundUser;
+    const foundUser = result.Item;
+    if (!foundUser) {
+        throw {
+            status: 400,
+            message: `User with id ${id} not found`
+        }
+    }
+
+    const currentRole = foundUser.role;
+    if (currentRole === role) {
+        throw {
+            status: 400,
+            message: `User is already role ${role}`
+        }
+    } else if (role !== "admin") {
+        throw {
+            status: 400,
+            message: "Cannot demote admin, use AWS console instead"
+        }
+    }
+
+    result = await userDAO.updateRole(id, role);
+    throwIfError(result);
 }
 
 const deleteUser = async (id) => {
@@ -62,6 +83,6 @@ function createToken(user) {
 module.exports = {
     register,
     login,
-    getUserByUsername,
-    deleteUser
+    deleteUser,
+    updateRole
 };

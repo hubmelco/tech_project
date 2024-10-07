@@ -1,30 +1,25 @@
-const { isValidString } = require("../utilities/stringUtilities");
+const { isValidBodyProperty } = require("../utilities/routerUtilities");
 
 function validateUsername(req, res, next) {
-    const username = req.body.username;
-
-    if(!isValidString(username)) {
-        res.status(400).json({
-            message: "Invalid username"
-        });
-        return;
+    if(isValidBodyProperty(req, res, "username")) {
+        next();
     }
-    next();
 }
 
 function validatePassword(req, res, next) {
-    const password = req.body.password;
-
-    if(!isValidString(password)) {
-        res.status(400).json({
-            message: "Invalid password"
-        });
-        return;
+    if(isValidBodyProperty(req, res, "password")) {
+        next();
     }
-    next();
+}
+
+function validateRole(req, res, next) {
+    if(isValidBodyProperty(req, res, "role")) {
+        next();
+    }
 }
 
 module.exports = {
     validateUsername,
-    validatePassword
+    validatePassword,
+    validateRole
 };

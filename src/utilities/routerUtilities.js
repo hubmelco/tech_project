@@ -9,6 +9,19 @@ function handleServiceError(error, res) {
     return res.status(statusCode).json({message});
 }
 
+function isValidBodyProperty(req, res, propertyName) {
+    const property = req.body[propertyName];
+
+    if(!isValidString(property)) {
+        res.status(400).json({
+            message: `Invalid property ${propertyName}`
+        });
+        return false;
+    }
+    return true;
+}
+
 module.exports = {
-    handleServiceError
+    handleServiceError,
+    isValidBodyProperty
 };
