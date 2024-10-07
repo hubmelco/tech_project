@@ -112,7 +112,7 @@ function createToken(user) {
 module.exports = {
     register,
     login,
-    getUserByUsername,
+    updateRole,
     updateUser,
     deleteUser
 };
