@@ -6,8 +6,8 @@ let mockDatabase = [];
 const mockPost1 = {
     class: "post",
     itemID: "e7b1998e-77d3-4cad-9955-f20135d840d0",
-    by: "user_1",
-    desc: "Hello world",
+    postedBy: "user_1",
+    description: "Hello world",
     score: 50,
     title: "Title",
     replies: []
@@ -15,8 +15,8 @@ const mockPost1 = {
 const mockPost2 = {
     class: "post",
     itemID: "29ee2056-c74e-4537-ac95-6234a2506426",
-    by: "user_2",
-    desc: "This is a great song",
+    postedBy: "user_2",
+    description: "This is a great song",
     score: 100,
     title: "Title",
     replies: []
@@ -77,7 +77,7 @@ describe('createPost test', () => {
         const response = await createPost(username, text, score, title);
         let added = false;
         mockDatabase.forEach((post) => {
-            if (post.class == "post" && post.by == username && post.desc == text && post.score == score && post.title == title && post.replies.length == 0) {
+            if (post.class == "post" && post.postedBy == username && post.description == text && post.score == score && post.title == title && post.replies.length == 0) {
                 added = true;
             }
         });

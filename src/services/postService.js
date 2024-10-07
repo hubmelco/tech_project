@@ -3,7 +3,7 @@ const postDAO = require("../repository/postDAO");
 const uuid = require("uuid");
 
 async function createPost(username, text, score, title){
-    const post = {class: "post", itemID: uuid.v4(), by: username, desc: text, score, title, replies: []};
+    const post = {class: "post", itemID: uuid.v4(), postedBy: username, description: text, score, title, replies: []};
     const data = await postDAO.sendPost(post);
     throwIfError(data);
     return post;
@@ -20,7 +20,7 @@ async function createReply(username, text, id){
     if (!post.Item) {
         throw {status: 400, message: "That post doesn't exist"};
     }
-    const reply = [{username, text}];
+    const reply = [{postedBy: username, description: text}];
     const data = await postDAO.sendReply(reply, id);
     throwIfError(data);
     return reply;
