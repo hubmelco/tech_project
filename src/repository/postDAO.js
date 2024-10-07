@@ -1,6 +1,5 @@
-const uuid = require("uuid");
 const { PutCommand, GetCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
-const { TableName, runCommand, commandBuilder } = require('../utilities/dynamoUtilities');
+const { TableName, runCommand } = require('../utilities/dynamoUtilities');
 
 const CLASS = "post";
 
