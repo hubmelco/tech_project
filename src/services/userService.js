@@ -17,7 +17,9 @@ async function register(username, password) {
         itemID: uuid.v4(),
         username,
         password,
-        role: "user"
+        role: "user",
+        bio: "",
+        genres: []
     }
     const result = await userDAO.putUser(user);
     throwIfError(result);
@@ -54,16 +56,16 @@ async function getUserById(userId) {
 }
 
 async function updateUser(userId, requestBody) {
-    const foundUser = await getUserById(userId);
+    const userToUpdate = await getUserById(userId);
 
     if (!requestBody.username) {
-        requestBody.username = foundUser.username;
+        requestBody.username = userToUpdate.username;
     }
     if (!requestBody.bio) {
-        requestBody.bio = foundUser.bio;
+        requestBody.bio = userToUpdate.bio //? userToUpdate.bio : "";
     }
     if (!requestBody.genres) {
-        requestBody.genres = foundUser.genres;
+        requestBody.genres = userToUpdate.genres //? userToUpdate.genres : [];
     }
 
     const result = await userDAO.updateUser(userId, requestBody);
