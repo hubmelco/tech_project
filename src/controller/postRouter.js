@@ -1,5 +1,5 @@
 const express = require('express');
-const { createPost } = require('../services/postService');
+const { createPost, getPost, updatePost } = require('../services/postService');
 const { handleServiceError } = require('../utilities/routerUtilities');
 const { authenticate } = require("../middleware/authMiddleware");
 const { validateTextBody, validateScore } = require('../middleware/postMiddleware');
@@ -14,6 +14,20 @@ postRouter.post("/", authenticate, validateTextBody, validateScore, async (req, 
         res.status(200).json({
             message: "Post successfully created"
         });
+    } catch (err) {
+        handleServiceError(err, res);
+    }
+});
+
+postRouter.patch("/:id", authenticate, async (req, res) => {
+    
+});
+
+postRouter.get("/:id", async (req, res) => {
+    const {id} = req.params;
+    try {
+        const post = await getPost(id);
+        res.status(200).json(post);
     } catch (err) {
         handleServiceError(err, res);
     }
