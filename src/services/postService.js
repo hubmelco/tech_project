@@ -10,7 +10,9 @@ async function createPost(username, text, score, title){
 }
 
 async function seePosts(){
-    return await postDAO.scanPosts();
+    const posts = await postDAO.scanPosts();
+    throwIfError(posts);
+    return posts;
 }
 
 async function createReply(username, text, id){
