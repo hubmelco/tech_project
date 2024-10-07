@@ -38,8 +38,14 @@ async function getPost(id) {
     return post;
 }
 
+async function updatePostFlag(id, flag) {
+    const result = await postDAO.updatePostFlag(id, flag);
+    throwIfError(result);
+}
+
 module.exports = {
     createPost,
     updatePost,
-    getPost
+    getPost,
+    updatePostFlag
 };

@@ -42,8 +42,24 @@ async function getPost(id) {
     return Item;
 }
 
+async function updatePostFlag(id, flag) {
+    const command = new UpdateCommand({
+        TableName,
+        Key: {class: CLASS, itemID: id},
+        UpdateExpression: "SET #isFlagged = :isFlagged",
+        ExpressionAttributeNames: {
+            "#isFlagged": "isFlagged" 
+        },
+        ExpressionAttributeValues: {
+            ":isFlagged": flag
+        }
+    })
+    return await runCommand(command);
+}
+
 module.exports = {
     sendPost,
     updatePost,
-    getPost
+    getPost,
+    updatePostFlag
 };
