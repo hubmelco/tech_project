@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const { register, login, updateRole } = require('../src/services/userService');
 const userDAO = require('../src/repository/userDAO');
+const { CLASS_USER } = require('../src/utilities/dynamoUtilities');
 
 jest.mock('bcrypt');
 jest.mock("jsonwebtoken");
@@ -10,24 +11,28 @@ jest.mock('../src/repository/userDAO');
 
 const mockDatabase = new Map();
 const mockUser1 = {
+    class: CLASS_USER,
     itemID: "f162b963-6b4e-4033-9159-2e0c13d78419",
     username: "user_1",
     password: "password1",
     role: "user"
 };
 const mockUser2 = {
+    class: CLASS_USER,
     itemID: "2dde0401-3c39-42ea-8145-f056fae354f7",
     username: "user_2",
     password: "password1",
     role: "user"
 };
 const mockUser3 = {
+    class: CLASS_USER,
     itemID: "8885755c-c6f9-4c83-bec4-899e334e7a39",
     username: "user_3",
     password: "password1",
     role: "user"
 };
 const mockAdmin = {
+    class: CLASS_USER,
     itemID: "81aaccf9-8128-49c5-a51c-12841778bf53",
     username: "admin_1",
     password: "password1",
@@ -192,7 +197,7 @@ describe("Delete User Tests", () => {
 })
 
 describe("Change User Role", () => {
-    test("Promotes valid user to admin", async ()=> {
+    test("Promotes valid user to admin", async () => {
         const id = mockUser1.itemID;
         const role = "admin";
 
@@ -201,8 +206,8 @@ describe("Change User Role", () => {
         const user = mockDatabase.get(mockUser1.username);
         expect(user.role).toEqual(role);
     });
-    
-    test("Throws when user is not found", async ()=> {
+
+    test("Throws when user is not found", async () => {
         const id = "Invalid_id";
         const role = "admin";
         let error;
@@ -215,8 +220,8 @@ describe("Change User Role", () => {
 
         expect(error.status).toEqual(400);
     });
-    
-    test("Throws if user is already role", async ()=> {
+
+    test("Throws if user is already role", async () => {
         const id = mockAdmin.itemID;
         const role = "admin";
         let error;
@@ -229,8 +234,8 @@ describe("Change User Role", () => {
 
         expect(error.status).toEqual(400);
     });
-    
-    test("Throws if trying to demote admin", async ()=> {
+
+    test("Throws if trying to demote admin", async () => {
         const id = mockAdmin.itemID;
         const role = "user";
         let error;

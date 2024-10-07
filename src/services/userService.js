@@ -40,9 +40,9 @@ const login = async (username, password) => {
 }
 
 const updateRole = async (id, role) => {
-    let result = await userDAO.getUserById(id);
-    throwIfError(result);
-    const foundUser = result.Item;
+    const getUserResult = await userDAO.getUserById(id);
+    throwIfError(getUserResult);
+    const foundUser = getUserResult.Item;
     if (!foundUser) {
         throw {
             status: 400,
@@ -63,8 +63,9 @@ const updateRole = async (id, role) => {
         }
     }
 
-    result = await userDAO.updateRole(id, role);
-    throwIfError(result);
+    const updateResult = await userDAO.updateRole(id, role);
+    throwIfError(updateResult);
+    return updateResult;
 }
 
 const deleteUser = async (id) => {
