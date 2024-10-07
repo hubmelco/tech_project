@@ -1,4 +1,4 @@
-const { PutCommand, ScanCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
+const { PutCommand, ScanCommand, GetCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
 const { TableName, runCommand } = require('../utilities/dynamoUtilities');
 
 const CLASS = "post";
@@ -39,8 +39,18 @@ async function sendReply(reply, id){
     return await runCommand(command);
 }
 
+async function getPost(id) {
+    const command = new GetCommand({
+        TableName,
+        Key: {class: CLASS, itemID: id}
+    });
+    const {Item} = await runCommand(command);
+    return Item;
+}
+
 module.exports = {
     sendPost,
     scanPosts,
-    sendReply
+    sendReply,
+    getPost
 };

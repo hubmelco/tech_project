@@ -19,7 +19,7 @@ postRouter.post("/", authenticate, validateTextBody, validateScore, async (req, 
     }
 });
 
-postRouter.get("/all", authenticate, async (req, res) => {
+postRouter.get("/", async (req, res) => {
     //TODO check song title exists in API
     try {
         const posts = await seePosts();
