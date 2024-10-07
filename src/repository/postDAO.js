@@ -1,19 +1,36 @@
 const uuid = require("uuid");
-const { PutCommand, GetCommand } = require("@aws-sdk/lib-dynamodb");
-const { TableName, runCommand } = require('../utilities/dynamoUtilities');
+const { PutCommand, GetCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
+const { TableName, runCommand, commandBuilder } = require('../utilities/dynamoUtilities');
 
 const CLASS = "post";
 
-async function sendPost(username, text, score, title){
+async function sendPost(Item){
     const command = new PutCommand({
         TableName: TableName,
-        Item: {class: "post", itemID: uuid.v4(), by: username, desc: text, score, title}
+        Item
     });
     return await runCommand(command);
 }
 
-async function updatePost() {
-
+async function updatePost(id, attributes) {
+    const command = new UpdateCommand({
+        TableName,
+        Key: {class: CLASS, itemID: id},
+        UpdateExpression: "SET #description = :description, #score = :score, #title = :title, #isFlagged = :isFlagged",
+        ExpressionAttributeNames: {
+            "#description": "description",
+            "#score": "score",
+            "#title": "title",
+            "#isFlagged": "isFlagged" 
+        },
+        ExpressionAttributeValues: {
+            ":description": attributes.description,
+            ":title": attributes.title,
+            ":score": attributes.score,
+            ":isFlagged": attributes.isFlagged
+        }
+    })
+    return await runCommand(command);
 }
 
 async function getPost(id) {
