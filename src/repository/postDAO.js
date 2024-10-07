@@ -23,7 +23,7 @@ async function scanPosts() {
         }
     })
     const response = await runCommand(command);
-    return response.Items;
+    return response;
 }
 
 async function sendReply(reply, id){
@@ -44,8 +44,7 @@ async function getPost(id) {
         TableName,
         Key: {class: CLASS, itemID: id}
     });
-    const {Item} = await runCommand(command);
-    return Item;
+    return await runCommand(command);
 }
 
 module.exports = {

@@ -35,11 +35,16 @@ beforeAll(() => {
     postDAO.getPost.mockImplementation(async (id) => {
         for (let i = 0; i < mockDatabase.length; i++){
             if (mockDatabase[i].itemID == id){
-                return true;
+                return {
+                    $metadata: {
+                        httpStatusCode: 200
+                    },
+                    Item: mockPost1
+                };
             }
         }
         return false;
-    })
+    });
     postDAO.sendReply.mockImplementation(async (reply, id) => {
         for (let i = 0; i < mockDatabase.length; i++){
             if (mockDatabase[i].itemID == id){
@@ -51,7 +56,7 @@ beforeAll(() => {
                 };
             }
         }
-    })
+    });
 });
 
 beforeEach(() => {

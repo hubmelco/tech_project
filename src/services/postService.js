@@ -12,12 +12,12 @@ async function createPost(username, text, score, title){
 async function seePosts(){
     const posts = await postDAO.scanPosts();
     throwIfError(posts);
-    return posts;
+    return posts.Items;
 }
 
 async function createReply(username, text, id){
-    const posts = await postDAO.getPost(id);
-    if (!posts) {
+    const post = await postDAO.getPost(id);
+    if (!post.Item) {
         throw {status: 400, message: "That post doesn't exist"};
     }
     const reply = [{username, text}];
