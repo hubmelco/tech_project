@@ -15,28 +15,36 @@ const mockUser1 = {
     itemID: "f162b963-6b4e-4033-9159-2e0c13d78419",
     username: "user_1",
     password: "password1",
-    role: "user"
+    role: "user",
+    liked: [],
+    disliked: []
 };
 const mockUser2 = {
     class: CLASS_USER,
     itemID: "2dde0401-3c39-42ea-8145-f056fae354f7",
     username: "user_2",
     password: "password1",
-    role: "user"
+    role: "user",
+    liked: [],
+    disliked: []
 };
 const mockUser3 = {
     class: CLASS_USER,
     itemID: "8885755c-c6f9-4c83-bec4-899e334e7a39",
     username: "user_3",
     password: "password1",
-    role: "user"
+    role: "user",
+    liked: [],
+    disliked: []
 };
 const mockAdmin = {
     class: CLASS_USER,
     itemID: "81aaccf9-8128-49c5-a51c-12841778bf53",
     username: "admin_1",
     password: "password1",
-    role: "admin"
+    role: "admin",
+    liked: [],
+    disliked: []
 };
 
 beforeAll(() => {

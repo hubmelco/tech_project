@@ -17,7 +17,9 @@ const register = async (username, password) => {
         itemID: uuid.v4(),
         username,
         password,
-        role: "user"
+        role: "user",
+        liked: [],
+        disliked: []
     }
     const result = await userDAO.putUser(user);
     throwIfError(result);
@@ -73,6 +75,46 @@ const deleteUser = async (id) => {
     await userDAO.deleteUser(id);
 }
 
+const addLike = async (like, postID, userID) => {
+    const user = await userDAO.getUserById(userID);
+    throwIfError(user);
+    if (like == 1){
+        if (user.Item.liked.includes(postID)){
+            throw {
+                status: 400,
+                message: "Post is already liked"
+            }
+        }
+        for (let i = 0; i < user.Item.disliked.length; i++){
+            if (user.Item.disliked[i] == postID){
+                const data = await userDAO.removeDislike(postID, userID);
+                throwIfError(data);
+                like = 2;
+            }
+        }
+        const result = await userDAO.updateLike(userID, postID);
+        throwIfError(result);
+    }
+    else{
+        if (user.Item.disliked.includes(postID)){
+            throw {
+                status: 400,
+                message: "Post is already disliked"
+            }
+        }
+        for (let i = 0; i < user.Item.liked.length; i++){
+            if (user.Item.liked[i] == postID){
+                const data = await userDAO.removeLike(postID, userID);
+                throwIfError(data);
+                like = -2;
+            }
+        }
+        const result = await userDAO.updateDislike(userID, postID);
+        throwIfError(result);
+    }
+    return like;
+}
+
 function createToken(user) {
     // Delete unneccesarry attributes as needed here
     delete (user.password);
@@ -85,5 +127,6 @@ module.exports = {
     register,
     login,
     deleteUser,
-    updateRole
+    updateRole,
+    addLike
 };

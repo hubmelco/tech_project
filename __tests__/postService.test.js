@@ -10,7 +10,8 @@ const mockPost1 = {
     description: "Hello world",
     score: 50,
     title: "Title",
-    replies: []
+    replies: [],
+    ratio: 0
 };
 const mockPost2 = {
     class: "post",
@@ -19,7 +20,8 @@ const mockPost2 = {
     description: "This is a great song",
     score: 100,
     title: "Title",
-    replies: []
+    replies: [],
+    ratio: 0
 };
 
 beforeAll(() => {
@@ -65,6 +67,8 @@ beforeEach(() => {
     mockDatabase.push(mockPost1);
     mockDatabase.push(mockPost2);
     postDAO.sendPost.mockClear();
+    postDAO.sendReply.mockClear();
+    postDAO.getPost.mockClear();
 });
 
 describe('createPost test', () => {
