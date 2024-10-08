@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const { register, login, updateRole } = require('../src/services/userService');
+const { register, login, updateRole, updateUser } = require('../src/services/userService');
 const userDAO = require('../src/repository/userDAO');
 const { CLASS_USER } = require('../src/utilities/dynamoUtilities');
 
@@ -15,21 +15,27 @@ const mockUser1 = {
     itemID: "f162b963-6b4e-4033-9159-2e0c13d78419",
     username: "user_1",
     password: "password1",
-    role: "user"
+    role: "user",
+    bio: "bio1",
+    genres: []
 };
 const mockUser2 = {
     class: CLASS_USER,
     itemID: "2dde0401-3c39-42ea-8145-f056fae354f7",
     username: "user_2",
     password: "password1",
-    role: "user"
+    role: "user",
+    bio: "bio2",
+    genres: []
 };
 const mockUser3 = {
     class: CLASS_USER,
     itemID: "8885755c-c6f9-4c83-bec4-899e334e7a39",
     username: "user_3",
     password: "password1",
-    role: "user"
+    role: "user",
+    bio: "bio3",
+    genres: []
 };
 const mockAdmin = {
     class: CLASS_USER,
@@ -106,6 +112,29 @@ beforeAll(() => {
             }
         };;
     });
+
+    userDAO.updateUser.mockImplementation((id, requestBody) => {
+        const user = userDAO.getUserById(id).Item;
+        let oldUsername = user.username;
+
+        if (requestBody.username) {
+            user.username = requestBody.username;
+        }
+        if (requestBody.bio) {
+            user.bio = requestBody.bio;
+        }
+        if (requestBody.genres) {
+            user.genres = requestBody.genres;
+        }
+
+        mockDatabase.delete(oldUsername);
+        mockDatabase.set(user.username, user);
+        return {
+            $metadata: {
+                httpStatusCode: 200
+            }
+        }
+    });
 });
 
 beforeEach(() => {
@@ -118,6 +147,7 @@ beforeEach(() => {
     userDAO.putUser.mockClear();
     userDAO.queryByUsername.mockClear();
     userDAO.getUserById.mockClear();
+    userDAO.updateUser.mockClear();
 });
 
 describe("register", () => {
@@ -189,10 +219,65 @@ describe("login", () => {
     });
 });
 
-describe("Update User Tests", () => {
+describe("Update User Profile Tests", () => {
 
     test("Updates the username of a user", async () => {
-        
+        const id = mockUser1.itemID;
+        const requestBody = { "username": "new_username" };
+
+        await updateUser(id, requestBody);
+
+        let updatedUser;
+        mockDatabase.forEach((user) => {
+            if (user.itemID === id) {
+                updatedUser = user;
+            }
+        });
+        expect(updatedUser.username).toBe(requestBody.username);
+    });
+
+    test("Updates the bio of a user", async () => {
+        const id = mockUser1.itemID;
+        const requestBody = { "bio": "new_bio" };
+
+        await updateUser(id, requestBody);
+
+        let updatedUser;
+        mockDatabase.forEach((user) => {
+            if (user.itemID === id) {
+                updatedUser = user;
+            }
+        });
+        expect(updatedUser.username).toBe(requestBody.username);
+    });
+
+    test("Updates the genres of a user", async () => {
+        const id = mockUser1.itemID;
+        const requestBody = { "genres": ["genre1", "genre2", "genre3"] };
+
+        await updateUser(id, requestBody);
+
+        let updatedUser;
+        mockDatabase.forEach((user) => {
+            if (user.itemID === id) {
+                updatedUser = user;
+            }
+        });
+        expect(updatedUser.username).toBe(requestBody.username);
+    });
+
+    test("Throws when user is not found", async () => {
+        const id = "invalid_id";
+        const requestBody = { "username": "new_username", "bio": "new_bio" };
+
+        let error;
+        try {
+            await updateUser(id, requestBody);
+        } catch (err) {
+            error = err;
+        }
+
+        expect(error.status).toEqual(400);
     });
 });
 

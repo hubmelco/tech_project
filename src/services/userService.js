@@ -78,16 +78,23 @@ async function getUserById(userId) {
 }
 
 async function updateUser(userId, requestBody) {
-    const userToUpdate = await getUserById(userId);
+    const foundUser = await getUserById(userId);
+
+    if (!foundUser) {
+        throw {
+            status: 400,
+            message: `User with id ${userId} not found`
+        }
+    }
 
     if (!requestBody.username) {
-        requestBody.username = userToUpdate.username;
+        requestBody.username = foundUser.username;
     }
     if (!requestBody.bio) {
-        requestBody.bio = userToUpdate.bio //? userToUpdate.bio : "";
+        requestBody.bio = foundUser.bio //? foundUser.bio : "";
     }
     if (!requestBody.genres) {
-        requestBody.genres = userToUpdate.genres //? userToUpdate.genres : [];
+        requestBody.genres = foundUser.genres //? foundUser.genres : [];
     }
 
     const result = await userDAO.updateUser(userId, requestBody);
