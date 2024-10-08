@@ -17,9 +17,11 @@ const register = async (username, password) => {
         itemID: uuid.v4(),
         username,
         password,
-        role: "user",
         postsLiked: [],
-        postsDisliked: []
+        postsDisliked: [],
+        role: "user",
+        bio: "",
+        genres: []
     }
     const result = await userDAO.putUser(user);
     throwIfError(result);
@@ -68,6 +70,39 @@ const updateRole = async (id, role) => {
     const updateResult = await userDAO.updateRole(id, role);
     throwIfError(updateResult);
     return updateResult;
+}
+
+async function getUserById(userId) {
+    const result = await userDAO.getUserById(userId);
+    throwIfError(result);
+    const foundUser = result?.Item;
+    return foundUser;
+}
+
+async function updateUser(userId, requestBody) {
+    const foundUser = await getUserById(userId);
+
+    if (!foundUser) {
+        throw {
+            status: 400,
+            message: `User with id ${userId} not found`
+        }
+    }
+
+    if (!requestBody.username) {
+        requestBody.username = foundUser.username;
+    }
+    if (!requestBody.bio) {
+        requestBody.bio = foundUser.bio //? foundUser.bio : "";
+    }
+    if (!requestBody.genres) {
+        requestBody.genres = foundUser.genres //? foundUser.genres : [];
+    }
+
+    const result = await userDAO.updateUser(userId, requestBody);
+    throwIfError(result);
+    const updatedUser = result?.Attributes;
+    return updatedUser;
 }
 
 const deleteUser = async (id) => {
@@ -124,7 +159,8 @@ function createToken(user) {
 module.exports = {
     register,
     login,
-    deleteUser,
+    addLike,
     updateRole,
-    addLike
+    updateUser,
+    deleteUser
 };

@@ -56,6 +56,28 @@ async function updateRole(id, role) {
             ":role": role
         }
     });
+}
+
+async function updateUser(userId, requestBody) {
+    const command = new UpdateCommand({
+        TableName,
+        Key: {
+            class: CLASS_USER,
+            itemID: userId
+        },
+        UpdateExpression: "set #username = :username, #bio = :bio, #genres = :genres",
+        ExpressionAttributeNames: {
+            "#username": "username",
+            "#bio": "bio",
+            "#genres": "genres"
+        },
+        ExpressionAttributeValues: {
+            ":username": requestBody.username,
+            ":bio": requestBody.bio,
+            ":genres": requestBody.genres
+        },
+        ReturnValues: "ALL_NEW"
+    });
     const response = await runCommand(command);
     return response;
 }
@@ -129,6 +151,8 @@ async function removeDislike(index, userID){
 module.exports = {
     putUser,
     queryByUsername,
+    getUserById,
+    updateUser,
     getUserById,
     updateRole,
     deleteUser,

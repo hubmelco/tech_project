@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const { register, login, updateRole, addLike } = require('../src/services/userService');
+const { register, login, updateRole, updateUser, addLike } = require('../src/services/userService');
 const userDAO = require('../src/repository/userDAO');
 const { CLASS_USER } = require('../src/utilities/dynamoUtilities');
 
@@ -17,7 +17,9 @@ const mockUser1 = {
     password: "password1",
     role: "user",
     postsLiked: [],
-    postsDisliked: []
+    postsDisliked: [],
+    bio: "bio1",
+    genres: []
 };
 const mockUser2 = {
     class: CLASS_USER,
@@ -26,7 +28,9 @@ const mockUser2 = {
     password: "password1",
     role: "user",
     postsLiked: [],
-    postsDisliked: []
+    postsDisliked: [],
+    bio: "bio2",
+    genres: []
 };
 const mockUser3 = {
     class: CLASS_USER,
@@ -35,7 +39,9 @@ const mockUser3 = {
     password: "password1",
     role: "user",
     postsLiked: [],
-    postsDisliked: []
+    postsDisliked: [],
+    bio: "bio3",
+    genres: []
 };
 const mockAdmin = {
     class: CLASS_USER,
@@ -158,6 +164,29 @@ beforeAll(() => {
             }
         };
     });
+
+    userDAO.updateUser.mockImplementation((id, requestBody) => {
+        const user = userDAO.getUserById(id).Item;
+        const oldUsername = user.username;
+
+        if (requestBody.username) {
+            user.username = requestBody.username;
+        }
+        if (requestBody.bio) {
+            user.bio = requestBody.bio;
+        }
+        if (requestBody.genres) {
+            user.genres = requestBody.genres;
+        }
+
+        mockDatabase.delete(oldUsername);
+        mockDatabase.set(user.username, user);
+        return {
+            $metadata: {
+                httpStatusCode: 200
+            }
+        }
+    });
 });
 
 beforeEach(() => {
@@ -174,6 +203,7 @@ beforeEach(() => {
     userDAO.updateDislike.mockClear();
     userDAO.removeLike.mockClear();
     userDAO.removeDislike.mockClear();
+    userDAO.updateUser.mockClear();
 });
 
 describe("register", () => {
@@ -245,12 +275,74 @@ describe("login", () => {
     });
 });
 
+describe("Update User Profile Tests", () => {
+
+    test("Updates the username of a user", async () => {
+        const id = mockUser1.itemID;
+        const requestBody = { "username": "new_username" };
+
+        await updateUser(id, requestBody);
+
+        let updatedUser;
+        mockDatabase.forEach((user) => {
+            if (user.itemID === id) {
+                updatedUser = user;
+            }
+        });
+        expect(updatedUser.username).toBe(requestBody.username);
+    });
+
+    test("Updates the bio of a user", async () => {
+        const id = mockUser1.itemID;
+        const requestBody = { "bio": "new_bio" };
+
+        await updateUser(id, requestBody);
+
+        let updatedUser;
+        mockDatabase.forEach((user) => {
+            if (user.itemID === id) {
+                updatedUser = user;
+            }
+        });
+        expect(updatedUser.username).toBe(requestBody.username);
+    });
+
+    test("Updates the genres of a user", async () => {
+        const id = mockUser1.itemID;
+        const requestBody = { "genres": ["genre1", "genre2", "genre3"] };
+
+        await updateUser(id, requestBody);
+
+        let updatedUser;
+        mockDatabase.forEach((user) => {
+            if (user.itemID === id) {
+                updatedUser = user;
+            }
+        });
+        expect(updatedUser.username).toBe(requestBody.username);
+    });
+
+    test("Throws error when user is not found", async () => {
+        const id = "invalid_id";
+        const requestBody = { "username": "new_username", "bio": "new_bio" };
+
+        let error;
+        try {
+            await updateUser(id, requestBody);
+        } catch (err) {
+            error = err;
+        }
+
+        expect(error.status).toEqual(400);
+    });
+});
+
 describe("Delete User Tests", () => {
     test("Deletes a user when called", async () => {
         // I don't know what to test, I just call the DAO with id which is a string by default because its provided in the url.
         expect(1).toBeTruthy();
-    })
-})
+    });
+});
 
 describe("Change User Role", () => {
     test("Promotes valid user to admin", async () => {
