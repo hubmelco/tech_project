@@ -90,7 +90,7 @@ describe('createPost test', () => {
         const score = 69;
         const title = "Hello";
 
-        const response = await createPost(username, text, score, title);
+        await createPost(username, text, score, title);
         let added = false;
         mockDatabase.forEach((post) => {
             if (post.class == "post" && post.postedBy == username && post.description == text && post.score == score && post.title == title && post.replies.length == 0) {
@@ -107,7 +107,7 @@ describe('createReply test', () => {
         const text = "I agree";
         const id = mockPost1.itemID;
 
-        const response = await createReply(username, text, id);
+        await createReply(username, text, id);
         let added = false;
         mockDatabase.forEach((post) => {
             if(post.itemID == id && post.replies.length > 0){
@@ -123,10 +123,23 @@ describe('checkLike test', () => {
         const id = mockPost1.itemID;
         const like = 1;
 
-        const response = await checkLike(like, id);
+        await checkLike(like, id);
         let added = false;
         mockDatabase.forEach((post) => {
             if(post.likes == 1){
+                added = true;
+            }
+        });
+        expect(added).toBeTruthy();
+    });
+    it('Successful dislike post', async () => {
+        const id = mockPost1.itemID;
+        const like = -1;
+
+        await checkLike(like, id);
+        let added = false;
+        mockDatabase.forEach((post) => {
+            if(post.likes == 0){
                 added = true;
             }
         });
