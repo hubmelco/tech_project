@@ -87,12 +87,10 @@ const addLike = async (like, postID, userID) => {
                 message: "Post is already liked"
             }
         }
-        for (let i = 0; i < dislikedList.length; i++){
-            if (dislikedList[i] == postID){
-                const data = await userDAO.removeDislike(postID, userID);
-                throwIfError(data);
-                like = 2;
-            }
+        if (dislikedList.includes(postID)){
+            const data = await userDAO.removeDislike(dislikedList.indexOf(postID), userID);
+            throwIfError(data);
+            like = 2;
         }
         const result = await userDAO.updateLike(postID, userID);
         throwIfError(result);
@@ -104,12 +102,10 @@ const addLike = async (like, postID, userID) => {
                 message: "Post is already disliked"
             }
         }
-        for (let i = 0; i < likedList.length; i++){
-            if (likedList[i] == postID){
-                const data = await userDAO.removeLike(postID, userID);
-                throwIfError(data);
-                like = -2;
-            }
+        if (likedList.includes(postID)){
+            const data = await userDAO.removeLike(likedList.indexOf(postID), userID);
+            throwIfError(data);
+            like = -2;
         }
         const result = await userDAO.updateDislike(postID, userID);
         throwIfError(result);

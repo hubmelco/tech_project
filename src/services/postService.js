@@ -21,13 +21,13 @@ async function createReply(username, text, id){
     if (!post.Item) {
         throw {status: 400, message: "That post doesn't exist"};
     }
-    const reply = [{postedBy: username, description: text}];
+    const reply = {postedBy: username, description: text};
     const data = await postDAO.sendReply(reply, id);
     throwIfError(data);
     return reply;
 }
 
-async function checkLike(like, postID, userID){
+async function checkLike(like, postID){
     const post = await postDAO.getPost(postID);
     if (!post.Item) {
         throw {status: 400, message: "That post doesn't exist"};

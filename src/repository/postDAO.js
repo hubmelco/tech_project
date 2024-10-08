@@ -29,7 +29,7 @@ async function sendReply(reply, id){
         TableName,
         Key: {"class": CLASS_POST, "itemID": id},
         ExpressionAttributeValues: {
-            ":reply": reply
+            ":reply": [reply]
         },
         UpdateExpression: "SET replies = list_append(replies, :reply)",
         ReturnValues: "UPDATED_NEW"

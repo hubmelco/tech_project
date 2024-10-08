@@ -78,7 +78,7 @@ async function updateLike(postID, userID){
         ExpressionAttributeValues: {
             ":post": [postID]
         },
-        UpdateExpression: "SET postsLiked = list_append(liked, :post)",
+        UpdateExpression: "SET postsLiked = list_append(postsLiked, :post)",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);
@@ -94,7 +94,7 @@ async function updateDislike(postID, userID){
         ExpressionAttributeValues: {
             ":post": [postID]
         },
-        UpdateExpression: "SET postsDisliked = list_append(disliked, :post)",
+        UpdateExpression: "SET postsDisliked = list_append(postsDisliked, :post)",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);
@@ -107,10 +107,7 @@ async function removeLike(index, userID){
             class: CLASS_USER,
             itemID: userID
         },
-        ExpressionAttributeValues: {
-            ":index": index
-        },
-        UpdateExpression: "DELETE postsLiked[:index]",
+        UpdateExpression: "REMOVE postsLiked["+index+"]",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);
@@ -123,10 +120,7 @@ async function removeDislike(index, userID){
             class: CLASS_USER,
             itemID: userID
         },
-        ExpressionAttributeValues: {
-            ":index": index
-        },
-        UpdateExpression: "DELETE postsDisliked[:index]",
+        UpdateExpression: "REMOVE postsDisliked["+index+"]",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);

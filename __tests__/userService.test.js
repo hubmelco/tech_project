@@ -137,9 +137,9 @@ beforeAll(() => {
         };
     });
 
-    userDAO.removeLike.mockImplementation((index, userID) => {
+    userDAO.removeLike.mockImplementation((postID, userID) => {
         const user = userDAO.getUserById(userID).Item;
-        user.postsLiked.splice(index, 1);
+        user.postsLiked.splice(user.postsLiked.indexOf(postID), 1);
         mockDatabase.set(user.username, user);
         return {
             $metadata: {
@@ -148,9 +148,9 @@ beforeAll(() => {
         };
     });
 
-    userDAO.removeDislike.mockImplementation((index, userID) => {
+    userDAO.removeDislike.mockImplementation((postID, userID) => {
         const user = userDAO.getUserById(userID).Item;
-        user.postsDisliked.splice(index, 1);
+        user.postsDisliked.splice(user.postsDisliked.indexOf(postID), 1);
         mockDatabase.set(user.username, user);
         return {
             $metadata: {
