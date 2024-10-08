@@ -17,7 +17,9 @@ const register = async (username, password) => {
         itemID: uuid.v4(),
         username,
         password,
-        role: "user"
+        role: "user",
+        bio: "",
+        genres: []
     }
     const result = await userDAO.putUser(user);
     throwIfError(result);
@@ -68,6 +70,39 @@ const updateRole = async (id, role) => {
     return updateResult;
 }
 
+async function getUserById(userId) {
+    const result = await userDAO.getUserById(userId);
+    throwIfError(result);
+    const foundUser = result?.Item;
+    return foundUser;
+}
+
+async function updateUser(userId, requestBody) {
+    const foundUser = await getUserById(userId);
+
+    if (!foundUser) {
+        throw {
+            status: 400,
+            message: `User with id ${userId} not found`
+        }
+    }
+
+    if (!requestBody.username) {
+        requestBody.username = foundUser.username;
+    }
+    if (!requestBody.bio) {
+        requestBody.bio = foundUser.bio //? foundUser.bio : "";
+    }
+    if (!requestBody.genres) {
+        requestBody.genres = foundUser.genres //? foundUser.genres : [];
+    }
+
+    const result = await userDAO.updateUser(userId, requestBody);
+    throwIfError(result);
+    const updatedUser = result?.Attributes;
+    return updatedUser;
+}
+
 const deleteUser = async (id) => {
     // Maybe add user exist check here, but not needed since dynamo wont error out with a not found id
     await userDAO.deleteUser(id);
@@ -84,6 +119,7 @@ function createToken(user) {
 module.exports = {
     register,
     login,
-    deleteUser,
-    updateRole
+    updateRole,
+    updateUser,
+    deleteUser
 };
