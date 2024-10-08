@@ -1,4 +1,4 @@
-const { createPost, createReply } = require("../src/services/postService");
+const { createPost, createReply, checkLike } = require("../src/services/postService");
 const postDAO = require("../src/repository/postDAO");
 
 jest.mock('../src/repository/postDAO');
@@ -11,7 +11,7 @@ const mockPost1 = {
     score: 50,
     title: "Title",
     replies: [],
-    ratio: 0
+    likes: 0
 };
 const mockPost2 = {
     class: "post",
@@ -21,7 +21,7 @@ const mockPost2 = {
     score: 100,
     title: "Title",
     replies: [],
-    ratio: 0
+    likes: 0
 };
 
 beforeAll(() => {
@@ -51,6 +51,18 @@ beforeAll(() => {
         for (let i = 0; i < mockDatabase.length; i++){
             if (mockDatabase[i].itemID == id){
                 mockDatabase[i].replies.push(reply);
+                return {
+                    $metadata: {
+                        httpStatusCode: 200
+                    }
+                };
+            }
+        }
+    });
+    postDAO.sendLike.mockImplementation(async (like, id) =>{
+        for (let i = 0; i < mockDatabase.length; i++){
+            if (mockDatabase[i].itemID == id){
+                mockDatabase[i].likes += like;
                 return {
                     $metadata: {
                         httpStatusCode: 200
@@ -99,6 +111,22 @@ describe('createReply test', () => {
         let added = false;
         mockDatabase.forEach((post) => {
             if(post.itemID == id && post.replies.length > 0){
+                added = true;
+            }
+        });
+        expect(added).toBeTruthy();
+    });
+});
+
+describe('checkLike test', () => {
+    it('Successful like post', async () => {
+        const id = "e7b1998e-77d3-4cad-9955-f20135d840d0";
+        const like = 1;
+
+        const response = await checkLike(like, id);
+        let added = false;
+        mockDatabase.forEach((post) => {
+            if(post.likes == 1){
                 added = true;
             }
         });

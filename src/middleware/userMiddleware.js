@@ -24,8 +24,20 @@ function validateRole(req, res, next) {
     res.status(400).json({ message: `Invalid role ${role}` });
 }
 
+function validateLike(req, res, next) {
+    const like = req.body.like;
+    if (isNaN(like) || (like != 1 && like != -1)){
+        res.status(400).json({
+            message: "Invalid like"
+        });
+        return;
+    }
+    next();
+}
+
 module.exports = {
     validateUsername,
     validatePassword,
-    validateRole
+    validateRole,
+    validateLike
 };

@@ -1,6 +1,7 @@
 const express = require('express');
-const { register, login, deleteUser, updateRole } = require('../services/userService');
-const { validateUsername, validatePassword, validateRole } = require('../middleware/userMiddleware');
+const postService = require('../services/postService');
+const { register, login, deleteUser, updateRole, addLike } = require('../services/userService');
+const { validateUsername, validatePassword, validateRole, validateLike } = require('../middleware/userMiddleware');
 const { adminAuthenticate } = require("../middleware/authMiddleware");
 const { handleServiceError } = require("../utilities/routerUtilities");
 
@@ -50,6 +51,19 @@ userRouter.patch("/:id/role", validateRole, adminAuthenticate, async (req, res) 
     try {
         await updateRole(id, role);
         return res.status(200).json({ message: `User role changed to ${role}` });
+    } catch (err) {
+        handleServiceError(err, res);
+    }
+});
+
+userRouter.patch("/:id/like", authenticate, validateLike, async (req, res) => {
+    //TODO check song title exists in API
+    try {
+        const like = await addLike(req.body.like, req.body.id, res.locals.user.itemID);
+        await postService.checkLike(like, req.body.id);
+        res.status(200).json({
+            message: "Updated like/dislike ratio on post"
+        });
     } catch (err) {
         handleServiceError(err, res);
     }
