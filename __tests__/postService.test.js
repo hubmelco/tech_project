@@ -1,4 +1,4 @@
-const { createPost, updatePost, updatePostFlag } = require("../src/services/postService");
+const { createPost, updatePost, updatePostFlag, getFlaggedPost } = require("../src/services/postService");
 const postDAO = require("../src/repository/postDAO");
 const uuid = require('uuid');
 const {throwIfError} = require("../src/utilities/dynamoUtilities")
@@ -105,5 +105,38 @@ describe("Test suite for flagging posts", () => {
         expect(postDAO.updatePostFlag.mock.calls.length).toBe(1);
         expect(postDAO.updatePostFlag.mock.calls[0][0]).toBe("random");
         expect(postDAO.updatePostFlag.mock.calls[0][1]).toBe(true);
+    })
+});
+
+describe("test suite for viewing flagged post", () => {
+    test("isFlagged is out of range", async () => {
+        // Type is already checked in router (postman test)
+        const isFlagged = 2;
+
+        postDAO.getFlaggedPost.mockResolvedValue({Items: []});
+
+        let error;
+        try {
+            await getFlaggedPost(isFlagged);
+            error = {status: "Should not have succeeded", message: "Should not have succeeded"};
+        } catch (err) {
+            error = err;
+        }
+        const {status, message} = error;
+        expect(status).toBe(400);
+        expect(message).not.toBe("Should not have succeeded");
+    });
+
+    test("isFlagged Valid", async () => {
+        const isFlagged = 1;
+
+        postDAO.getFlaggedPost.mockResolvedValue({Items: []});
+
+        const flaggedPosts = await getFlaggedPost(isFlagged);
+
+        expect(postDAO.getFlaggedPost.mock.calls.length).toBe(1);
+        expect(postDAO.getFlaggedPost.mock.calls[0][0]).toBe(isFlagged);
+        expect(flaggedPosts).toEqual([]);
+
     })
 })
