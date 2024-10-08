@@ -43,6 +43,16 @@ postRouter.patch("/replies", authenticate, validateTextBody, async (req, res) =>
     }
 });
 
+postRouter.patch("/:id", async (req, res) => {
+    const { id } = req.params;
+    const { title, score, description } = req.body;
+    try {
+        await updatePost(id,);
+    } catch (err) {
+        handleServiceError(err, res);
+    }
+});
+
 postRouter.delete("/:id", async (req, res) => {
     const { id } = req.params;
     try {

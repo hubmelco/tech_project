@@ -41,6 +41,10 @@ const seePosts = async () => {
     return posts.Items;
 }
 
+const updatePost = async (id, title, description, score) => {
+    const foundPost = await getPostById(id);
+};
+
 const deletePost = async (id) => {
     await getPostById(id);
 
@@ -53,5 +57,6 @@ module.exports = {
     createReply,
     getPostById,
     seePosts,
+    updatePost,
     deletePost
 };
