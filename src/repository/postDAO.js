@@ -1,8 +1,43 @@
-const uuid = require("uuid");
-const { PutCommand, GetCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
-const { TableName, CLASS_POST, runCommand, CLASS_USER } = require('../utilities/dynamoUtilities');
+const { PutCommand, ScanCommand, GetCommand, UpdateCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+const { TableName, runCommand, CLASS_POST } = require('../utilities/dynamoUtilities');
 
-async function getPost(id) {
+const sendPost = async (post) => {
+    const command = new PutCommand({
+        TableName: TableName,
+        Item: post
+    });
+    return await runCommand(command);
+}
+
+const sendReply = async (reply, id){
+    const command = new UpdateCommand({
+        TableName: TableName,
+        Key: { "class": CLASS_POST, "itemID": id },
+        ExpressionAttributeValues: {
+            ":reply": reply
+        },
+        UpdateExpression: "SET replies = list_append(replies, :reply)",
+        ReturnValues: "UPDATED_NEW"
+    });
+    return await runCommand(command);
+}
+
+const scanPosts = async () => {
+    const command = new ScanCommand({
+        TableName: TableName,
+        FilterExpression: "#class = :class",
+        ExpressionAttributeNames: {
+            "#class": "class"
+        },
+        ExpressionAttributeValues: {
+            ":class": CLASS_POST
+        }
+    })
+    const response = await runCommand(command);
+    return response;
+}
+
+const getPost = async (id) => {
     const command = new GetCommand({
         TableName,
         Key: { class: CLASS_POST, itemID: id }
@@ -10,23 +45,18 @@ async function getPost(id) {
     return await runCommand(command);
 }
 
-async function sendPost(username, text, score, title) {
-    const command = new PutCommand({
-        TableName,
-        Item: { class: CLASS_POST, itemID: uuid.v4(), by: username, desc: text, score, title }
-    });
-    return await runCommand(command);
-}
-
-async function deletePost(id) {
+const deletePost = async (id) => {
     const command = new DeleteCommand({
         TableName,
-        Key: { class: CLASS_USER, itemID: id }
+        Key: { class: CLASS_POST, itemID: id }
     });
     return await runCommand(command);
 }
 
 module.exports = {
+    sendPost,
+    sendReply,
     getPost,
-    sendPost
+    scanPosts,
+    deletePost
 };

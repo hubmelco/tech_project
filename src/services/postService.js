@@ -1,10 +1,24 @@
-const { throwIfError } = require('../utilities/dynamoUtilities');
+const { throwIfError, CLASS_POST } = require('../utilities/dynamoUtilities');
 const postDAO = require("../repository/postDAO");
 
+const uuid = require("uuid");
+
 const createPost = async (username, text, score, title) => {
-    const post = await postDAO.sendPost(username, text, score, title);
-    throwIfError(post);
-    return { message: "Post created successfully" };
+    const post = { class: CLASS_POST, itemID: uuid.v4(), postedBy: username, description: text, score, title, replies: [] };
+    const data = await postDAO.sendPost(post);
+    throwIfError(data);
+    return post;
+}
+
+const createReply = async (username, text, id) => {
+    const post = await postDAO.getPost(id);
+    if (!post.Item) {
+        throw { status: 400, message: "That post doesn't exist" };
+    }
+    const reply = [{ postedBy: username, description: text }];
+    const data = await postDAO.sendReply(reply, id);
+    throwIfError(data);
+    return reply;
 }
 
 const getPostById = async (id) => {
@@ -21,6 +35,12 @@ const getPostById = async (id) => {
     return foundPost;
 }
 
+const seePosts = async () => {
+    const posts = await postDAO.scanPosts();
+    throwIfError(posts);
+    return posts.Items;
+}
+
 const deletePost = async (id) => {
     await getPostById(id);
 
@@ -30,6 +50,8 @@ const deletePost = async (id) => {
 
 module.exports = {
     createPost,
+    createReply,
     getPostById,
+    seePosts,
     deletePost
 };
