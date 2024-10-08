@@ -2,7 +2,7 @@ const express = require('express');
 const postService = require('../services/postService');
 const { register, login, deleteUser, updateRole, addLike } = require('../services/userService');
 const { validateUsername, validatePassword, validateRole, validateLike } = require('../middleware/userMiddleware');
-const { adminAuthenticate } = require("../middleware/authMiddleware");
+const { adminAuthenticate, authenticate } = require("../middleware/authMiddleware");
 const { handleServiceError } = require("../utilities/routerUtilities");
 
 const userRouter = express.Router();
@@ -59,8 +59,8 @@ userRouter.patch("/:id/role", validateRole, adminAuthenticate, async (req, res) 
 userRouter.patch("/:id/like", authenticate, validateLike, async (req, res) => {
     //TODO check song title exists in API
     try {
-        const like = await addLike(req.body.like, req.body.id, res.locals.user.itemID);
-        await postService.checkLike(like, req.body.id);
+        const like = await addLike(req.body.like, req.params.id, res.locals.user.itemID);
+        await postService.checkLike(like, req.params.id);
         res.status(200).json({
             message: "Updated like/dislike ratio on post"
         });

@@ -105,7 +105,7 @@ describe('createReply test', () => {
     it('Successful reply creation', async () => {
         const username = "Mac";
         const text = "I agree";
-        const id = "e7b1998e-77d3-4cad-9955-f20135d840d0";
+        const id = mockPost1.itemID;
 
         const response = await createReply(username, text, id);
         let added = false;
@@ -120,7 +120,7 @@ describe('createReply test', () => {
 
 describe('checkLike test', () => {
     it('Successful like post', async () => {
-        const id = "e7b1998e-77d3-4cad-9955-f20135d840d0";
+        const id = mockPost1.itemID;
         const like = 1;
 
         const response = await checkLike(like, id);

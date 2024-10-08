@@ -18,8 +18,8 @@ const register = async (username, password) => {
         username,
         password,
         role: "user",
-        liked: [],
-        disliked: []
+        postsLiked: [],
+        postsDisliked: []
     }
     const result = await userDAO.putUser(user);
     throwIfError(result);
@@ -78,38 +78,40 @@ const deleteUser = async (id) => {
 const addLike = async (like, postID, userID) => {
     const user = await userDAO.getUserById(userID);
     throwIfError(user);
+    const dislikedList = user.Item.postsDisliked;
+    const likedList = user.Item.postsLiked;
     if (like == 1){
-        if (user.Item.liked.includes(postID)){
+        if (likedList.includes(postID)){
             throw {
                 status: 400,
                 message: "Post is already liked"
             }
         }
-        for (let i = 0; i < user.Item.disliked.length; i++){
-            if (user.Item.disliked[i] == postID){
+        for (let i = 0; i < dislikedList.length; i++){
+            if (dislikedList[i] == postID){
                 const data = await userDAO.removeDislike(postID, userID);
                 throwIfError(data);
                 like = 2;
             }
         }
-        const result = await userDAO.updateLike(userID, postID);
+        const result = await userDAO.updateLike(postID, userID);
         throwIfError(result);
     }
     else{
-        if (user.Item.disliked.includes(postID)){
+        if (dislikedList.includes(postID)){
             throw {
                 status: 400,
                 message: "Post is already disliked"
             }
         }
-        for (let i = 0; i < user.Item.liked.length; i++){
-            if (user.Item.liked[i] == postID){
+        for (let i = 0; i < likedList.length; i++){
+            if (likedList[i] == postID){
                 const data = await userDAO.removeLike(postID, userID);
                 throwIfError(data);
                 like = -2;
             }
         }
-        const result = await userDAO.updateDislike(userID, postID);
+        const result = await userDAO.updateDislike(postID, userID);
         throwIfError(result);
     }
     return like;

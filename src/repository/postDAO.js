@@ -52,7 +52,7 @@ async function sendLike(like, id){
         ExpressionAttributeValues: {
             ":r": like
         },
-        UpdateExpression: "ADD ratio :r",
+        UpdateExpression: "ADD likes :r",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);

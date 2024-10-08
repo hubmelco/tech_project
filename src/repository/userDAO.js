@@ -68,7 +68,7 @@ const deleteUser = async (id) => {
     await runCommand(command);
 }
 
-async function updateLike(userID, postID){
+async function updateLike(postID, userID){
     const command = new UpdateCommand({
         TableName,
         Key: {
@@ -76,15 +76,15 @@ async function updateLike(userID, postID){
             itemID: userID
         },
         ExpressionAttributeValues: {
-            ":post": postID
+            ":post": [postID]
         },
-        UpdateExpression: "SET liked = list_append(liked, :post)",
+        UpdateExpression: "SET postsLiked = list_append(liked, :post)",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);
 }
 
-async function updateDislike(userID, postID){
+async function updateDislike(postID, userID){
     const command = new UpdateCommand({
         TableName,
         Key: {
@@ -92,15 +92,15 @@ async function updateDislike(userID, postID){
             itemID: userID
         },
         ExpressionAttributeValues: {
-            ":post": postID
+            ":post": [postID]
         },
-        UpdateExpression: "SET disliked = list_append(disliked, :post)",
+        UpdateExpression: "SET postsDisliked = list_append(disliked, :post)",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);
 }
 
-async function removeLike(index, postID, userID){
+async function removeLike(index, userID){
     const command = new UpdateCommand({
         TableName,
         Key: {
@@ -108,16 +108,15 @@ async function removeLike(index, postID, userID){
             itemID: userID
         },
         ExpressionAttributeValues: {
-            ":post": postID,
             ":index": index
         },
-        UpdateExpression: "DELETE liked[:index]",
+        UpdateExpression: "DELETE postsLiked[:index]",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);
 }
 
-async function removeDislike(index, postID, userID){
+async function removeDislike(index, userID){
     const command = new UpdateCommand({
         TableName,
         Key: {
@@ -125,10 +124,9 @@ async function removeDislike(index, postID, userID){
             itemID: userID
         },
         ExpressionAttributeValues: {
-            ":post": postID,
             ":index": index
         },
-        UpdateExpression: "DELETE disliked[:index]",
+        UpdateExpression: "DELETE postsDisliked[:index]",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);

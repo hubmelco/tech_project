@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const { register, login, updateRole } = require('../src/services/userService');
+const { register, login, updateRole, addLike } = require('../src/services/userService');
 const userDAO = require('../src/repository/userDAO');
 const { CLASS_USER } = require('../src/utilities/dynamoUtilities');
 
@@ -16,8 +16,8 @@ const mockUser1 = {
     username: "user_1",
     password: "password1",
     role: "user",
-    liked: [],
-    disliked: []
+    postsLiked: [],
+    postsDisliked: []
 };
 const mockUser2 = {
     class: CLASS_USER,
@@ -25,8 +25,8 @@ const mockUser2 = {
     username: "user_2",
     password: "password1",
     role: "user",
-    liked: [],
-    disliked: []
+    postsLiked: [],
+    postsDisliked: []
 };
 const mockUser3 = {
     class: CLASS_USER,
@@ -34,8 +34,8 @@ const mockUser3 = {
     username: "user_3",
     password: "password1",
     role: "user",
-    liked: [],
-    disliked: []
+    postsLiked: [],
+    postsDisliked: []
 };
 const mockAdmin = {
     class: CLASS_USER,
@@ -43,8 +43,8 @@ const mockAdmin = {
     username: "admin_1",
     password: "password1",
     role: "admin",
-    liked: [],
-    disliked: []
+    postsLiked: [],
+    postsDisliked: []
 };
 
 beforeAll(() => {
@@ -112,7 +112,51 @@ beforeAll(() => {
             $metadata: {
                 httpStatusCode: 200
             }
-        };;
+        };
+    });
+
+    userDAO.updateLike.mockImplementation((postID, userID) => {
+        const user = userDAO.getUserById(userID).Item;
+        user.postsLiked.push(postID);
+        mockDatabase.set(user.username, user);
+        return {
+            $metadata: {
+                httpStatusCode: 200
+            }
+        };
+    });
+
+    userDAO.updateDislike.mockImplementation((postID, userID) => {
+        const user = userDAO.getUserById(userID).Item;
+        user.postsDisliked.push(postID);
+        mockDatabase.set(user.username, user);
+        return {
+            $metadata: {
+                httpStatusCode: 200
+            }
+        };
+    });
+
+    userDAO.removeLike.mockImplementation((index, userID) => {
+        const user = userDAO.getUserById(userID).Item;
+        user.postsLiked.splice(index, 1);
+        mockDatabase.set(user.username, user);
+        return {
+            $metadata: {
+                httpStatusCode: 200
+            }
+        };
+    });
+
+    userDAO.removeDislike.mockImplementation((index, userID) => {
+        const user = userDAO.getUserById(userID).Item;
+        user.postsDisliked.splice(index, 1);
+        mockDatabase.set(user.username, user);
+        return {
+            $metadata: {
+                httpStatusCode: 200
+            }
+        };
     });
 });
 
@@ -126,6 +170,10 @@ beforeEach(() => {
     userDAO.putUser.mockClear();
     userDAO.queryByUsername.mockClear();
     userDAO.getUserById.mockClear();
+    userDAO.updateLike.mockClear();
+    userDAO.updateDislike.mockClear();
+    userDAO.removeLike.mockClear();
+    userDAO.removeDislike.mockClear();
 });
 
 describe("register", () => {
@@ -255,5 +303,56 @@ describe("Change User Role", () => {
         }
 
         expect(error.status).toEqual(400);
+    });
+
+});
+
+describe("Likes/dislikes", () => {
+    test("User likes post", async () => {
+        const userID = mockUser1.itemID;
+        const postID = "whatever";
+        const like = 1;
+
+        await addLike(like, postID, userID);
+        let likeAdded = false;
+        mockDatabase.forEach((user) => {
+            if (user.postsLiked.includes(postID) && !user.postsDisliked.includes(postID)) {
+                likeAdded = true;
+            }
+        });
+
+        expect(likeAdded).toBeTruthy();
+    });
+
+    test("User dislikes same post", async () => {
+        const userID = mockUser1.itemID;
+        const postID = "whatever";
+        const like = -1;
+
+        await addLike(like, postID, userID);
+        let dislikeAdded = false;
+        mockDatabase.forEach((user) => {
+            if (user.postsDisliked.includes(postID) && !user.postsLiked.includes(postID)) {
+                dislikeAdded = true;
+            }
+        });
+
+        expect(dislikeAdded).toBeTruthy();
+    });
+
+    test("User re-likes same post", async () => {
+        const userID = mockUser1.itemID;
+        const postID = "whatever";
+        const like = 1;
+
+        await addLike(like, postID, userID);
+        let likeAdded = false;
+        mockDatabase.forEach((user) => {
+            if (user.postsLiked.includes(postID) && !user.postsDisliked.includes(postID)) {
+                likeAdded = true;
+            }
+        });
+
+        expect(likeAdded).toBeTruthy();
     });
 });
