@@ -115,7 +115,7 @@ beforeAll(() => {
 
     userDAO.updateUser.mockImplementation((id, requestBody) => {
         const user = userDAO.getUserById(id).Item;
-        let oldUsername = user.username;
+        const oldUsername = user.username;
 
         if (requestBody.username) {
             user.username = requestBody.username;
@@ -266,7 +266,7 @@ describe("Update User Profile Tests", () => {
         expect(updatedUser.username).toBe(requestBody.username);
     });
 
-    test("Throws when user is not found", async () => {
+    test("Throws error when user is not found", async () => {
         const id = "invalid_id";
         const requestBody = { "username": "new_username", "bio": "new_bio" };
 
