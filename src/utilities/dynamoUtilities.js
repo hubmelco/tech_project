@@ -4,6 +4,7 @@ const { DynamoDBDocumentClient } = require('@aws-sdk/lib-dynamodb');
 // Table & Index names
 const TableName = "Technology_Project";
 const UsernameIndex = "username-index";
+const flaggedIndex = "class-isFlagged-index"
 
 const client = new DynamoDBClient({ region: "us-east-2" });
 const documentClient = DynamoDBDocumentClient.from(client);
@@ -31,6 +32,7 @@ function throwIfError(result) {
 module.exports = {
     TableName,
     UsernameIndex,
+    flaggedIndex,
     runCommand,
     throwIfError
 };

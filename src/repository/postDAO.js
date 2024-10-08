@@ -1,5 +1,5 @@
-const { PutCommand, GetCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
-const { TableName, runCommand } = require('../utilities/dynamoUtilities');
+const { PutCommand, GetCommand, UpdateCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
+const { TableName, runCommand, flaggedIndex } = require('../utilities/dynamoUtilities');
 
 const CLASS = "post";
 
@@ -56,9 +56,28 @@ async function updatePostFlag(id, flag) {
     return await runCommand(command);
 }
 
+async function getFlaggedPost(isFlagged) {
+    const command = new QueryCommand({
+        TableName,
+        IndexName: "class-isFlagged-index",
+        KeyConditionExpression: "#class = :class AND #isFlagged = :isFlagged",
+        ExpressionAttributeNames: {
+            "#class": "class",
+            "#isFlagged": "isFlagged"
+        },
+        ExpressionAttributeValues: {
+            ":isFlagged": isFlagged,
+            ":class": CLASS
+        }
+    })
+    const result = await runCommand(command);
+    return result
+}
+
 module.exports = {
     sendPost,
     updatePost,
     getPost,
-    updatePostFlag
+    updatePostFlag,
+    getFlaggedPost
 };
