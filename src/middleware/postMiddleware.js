@@ -1,41 +1,21 @@
-function validateTitle(req, res, next) {
-    const title = req.body.title;
+const { validateBody } = require("../utilities/routerUtilities");
+const { isValidString } = require("../utilities/stringUtilities");
 
-    if (!title) {
-        res.status(400).json({
-            message: "Invalid post title"
-        });
-        return;
-    }
-    next();
+function validateTitle(required = true) {
+    return validateBody("score", (title) => isValidString(title), required);
 }
 
-function validateTextBody(req, res, next) {
-    const desc = req.body.text;
-
-    if (!desc) {
-        res.status(400).json({
-            message: "Invalid post text"
-        });
-        return;
-    }
-    next();
+function validateScore(required = true) {
+    const isValidScore = (score) => !isNaN(score) && score >= 0 && score <= 100;
+    return validateBody("score", isValidScore, required);
 }
 
-function validateScore(req, res, next) {
-    const score = req.body.score;
-
-    if (isNaN(score) || score < 0 || score > 100) {
-        res.status(400).json({
-            message: "Invalid score"
-        });
-        return;
-    }
-    next();
+function validateTextBody(required = true) {
+    return validateBody("score", (text) => isValidString(text), required);
 }
 
 module.exports = {
     validateTitle,
-    validateTextBody,
-    validateScore
+    validateScore,
+    validateTextBody
 }

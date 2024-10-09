@@ -6,7 +6,7 @@ const { handleServiceError } = require("../utilities/routerUtilities");
 
 const userRouter = express.Router();
 
-userRouter.post("/", validateUsername, validatePassword, async (req, res) => {
+userRouter.post("/", validateUsername(), validatePassword(), async (req, res) => {
     const { username, password } = req.body;
 
     try {
@@ -20,7 +20,7 @@ userRouter.post("/", validateUsername, validatePassword, async (req, res) => {
     }
 });
 
-userRouter.post("/login", validateUsername, validatePassword, async (req, res) => {
+userRouter.post("/login", validateUsername(), validatePassword(), async (req, res) => {
     const { username, password } = req.body;
 
     try {
@@ -60,7 +60,7 @@ userRouter.delete("/:id", adminAuthenticate, async (req, res) => {
     }
 });
 
-userRouter.patch("/:id/role", validateRole, adminAuthenticate, async (req, res) => {
+userRouter.patch("/:id/role", adminAuthenticate, validateRole(), async (req, res) => {
     const { id } = req.params;
     const { role } = req.body;
     try {

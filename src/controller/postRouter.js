@@ -1,17 +1,16 @@
 const express = require('express');
-const { createPost, createReply, seePosts, updatePost, getPostById, deletePost } = require('../services/postService');
+const { createPost, createReply, seePosts, updatePost, deletePost } = require('../services/postService');
 const { handleServiceError } = require('../utilities/routerUtilities');
 const { authenticate, postOwnerAuthenticate } = require("../middleware/authMiddleware");
 const { validateTextBody, validateScore, validateTitle } = require('../middleware/postMiddleware');
-const { getUserByUsername } = require('../services/userService');
 
 
 const postRouter = express.Router();
 
-postRouter.post("/", authenticate, validateTitle, validateTextBody, validateScore, async (req, res) => {
+postRouter.post("/", authenticate, validateTitle(), validateTextBody(), validateScore(), async (req, res) => {
     //TODO check song title exists in API
     const { text, score, title } = req.body;
-    
+
     try {
         await createPost(res.locals.user.username, text, score, title);
         res.status(200).json({
@@ -34,7 +33,7 @@ postRouter.get("/", async (req, res) => {
     }
 });
 
-postRouter.patch("/replies", authenticate, validateTextBody, async (req, res) => {
+postRouter.patch("/replies", authenticate, validateTextBody(), async (req, res) => {
     //TODO check song title exists in API
     const { text, id } = req.body;
 
@@ -48,17 +47,19 @@ postRouter.patch("/replies", authenticate, validateTextBody, async (req, res) =>
     }
 });
 
-postRouter.patch("/:postId", postOwnerAuthenticate, async (req, res) => {
-    const postId = req.params.postId;
-    const { title, score, description } = req.body;
+postRouter.patch("/:postId", postOwnerAuthenticate, validateTitle(false), validateTextBody(false), validateScore(false),
+    async (req, res) => {
+        const postId = req.params.postId;
+        const { title, score, description } = req.body;
 
-    try {
-        await updatePost(postId, title, score, description);
-        return res.status(200).json({ message: "Updated post", data: postId });
-    } catch (err) {
-        handleServiceError(err, res);
+        try {
+            await updatePost(postId, title, score, description);
+            return res.status(200).json({ message: "Updated post", data: postId });
+        } catch (err) {
+            handleServiceError(err, res);
+        }
     }
-});
+);
 
 postRouter.delete("/:postId", postOwnerAuthenticate, async (req, res) => {
     const postId = req.params.postId;
