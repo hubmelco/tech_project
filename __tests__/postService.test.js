@@ -153,7 +153,7 @@ describe('checkLike test', () => {
         });
         expect(added).toBeTruthy();
     });
-    it('Successful dislike post', async () => {
+    it('Successful dislike post on post that was already liked', async () => {
         const id = mockPost1.itemID;
         const like = -1;
         const userID = "f162b963-6b4e-4033-9159-2e0c13d78419";
@@ -163,28 +163,10 @@ describe('checkLike test', () => {
         mockDatabase.forEach((post) => {
             if (post.itemID == id){
                 for (const i of post.likedBy){
-                    if(i.userID == userID && i.like == -1){
+                    if (i.userID == userID && i.like == -1){
                         added = true;
                     }
-                }
-            }
-        });
-        expect(added).toBeTruthy();
-    });
-    it('Dislike previously liked post', async () => {
-        const id = mockPost1.itemID;
-        const userID = "f162b963-6b4e-4033-9159-2e0c13d78419";
-
-        await checkLike(1, id, userID);
-        await checkLike(-1, id, userID);
-        let added = false;
-        mockDatabase.forEach((post) => {
-            if (post.itemID == id){
-                for (const i of post.likedBy){
-                    if(i.userID == userID && i.like == -1){
-                        added = true;
-                    }
-                    if(i.userID == userID && i.like == 1){
+                    if (i.userID == userID && i.like == 1){
                         added = false;
                         return;
                     }
