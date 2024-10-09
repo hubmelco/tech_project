@@ -22,21 +22,25 @@ postRouter.patch("/:id", authenticate, async (req, res) => {
     try {
         const post = await getPost(id);
         const {user} = res.locals;
+        let {flag} = req.body;
+        if (flag !== undefined && post.postedBy === user.username) {
+            flag = undefined; // Users cannot flag/unflag their own post
+        }
+        if (flag !== undefined && (typeof(flag) !== "number" || (flag > 1 || flag < 0))) {
+            return res.status(400).json({message: "provided flag must be a number (0 or 1)"});
+        }
+
         if (user.role === "user" && post.postedBy !== user.username) {
             //Can't update, can only flag if not an admin or the poster
-            const {flag} = req.body;
             if (flag === undefined) {
                 return res.status(400).json({message: "flag must be provided in body"});
-            }
-            if (typeof(flag) !== "number" || (flag < 0 || flag > 1)) {
-                return res.status(400).json({message: "flag must be a number (0 or 1)"});
             }
             await updatePostFlag(id, flag);
             return res.status(200).json({id, updated: {isFlagged: flag}})
         } else {
             // Only get updatable fields from the body
-            const {description, title, score, flag} = req.body;
-            if (!description && !title && !score && !flag) {
+            const {description, title, score} = req.body;
+            if (description === undefined && title === undefined && score === undefined && flag === undefined) {
                 return res.status(400).json({message: "No updatable attributes provided. Must provide description, title, flag, or score in body"});
             }
             if (score && typeof(score) !== "number") {
@@ -47,12 +51,6 @@ postRouter.patch("/:id", authenticate, async (req, res) => {
             }
             if (title && typeof(title) !== "string") {
                 return res.status(400).json({message: "provided title must be of type string"});
-            }
-            if (flag !== undefined && post.postedBy === user.username) {
-                flag = undefined; // Users and admins cannot flag/unflag their own post
-            }
-            if (flag !== undefined && (typeof(flag) !== "number" || (flag > 1 || flag < 0))) {
-                return res.status(400).json({message: "provided flag must be a number (0 or 1)"});
             }
             const updated = await updatePost(id, post, {description: description, title: title, score: score, isFlagged: flag});
             return res.status(200).json({id, updated});
