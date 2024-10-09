@@ -21,7 +21,7 @@ async function createReply(userID, text, id){
     if (!post.Item) {
         throw {status: 400, message: `Post ${id} doesn't exist`};
     }
-    const reply = {postedBy: userID, description: text};
+    const reply = {postedBy: userID, description: text, itemID: uuid.v4()};
     const data = await postDAO.sendReply(reply, id);
     throwIfError(data);
     return reply;
