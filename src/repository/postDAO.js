@@ -7,9 +7,9 @@ const sendPost = async (post) => {
         Item: post
     });
     return await runCommand(command);
-}
+};
 
-const sendReply = async (reply, id){
+const sendReply = async (reply, id) => {
     const command = new UpdateCommand({
         TableName: TableName,
         Key: { "class": CLASS_POST, "itemID": id },
@@ -20,7 +20,7 @@ const sendReply = async (reply, id){
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);
-}
+};
 
 const scanPosts = async () => {
     const command = new ScanCommand({
@@ -35,7 +35,7 @@ const scanPosts = async () => {
     })
     const response = await runCommand(command);
     return response;
-}
+};
 
 const getPost = async (id) => {
     const command = new GetCommand({
@@ -43,7 +43,23 @@ const getPost = async (id) => {
         Key: { class: CLASS_POST, itemID: id }
     });
     return await runCommand(command);
-}
+};
+
+const updatePost = async (post) => {
+    const command = new UpdateCommand({
+        TableName,
+        Key: { class: CLASS_POST, itemID: post.itemID },
+        UpdateExpression:
+            "set title = :title, score = :score, description = :description",
+        ExpressionAttributeValues: {
+            ":title": post.title,
+            ":score": post.score,
+            ":description": post.description
+        },
+        ReturnValues: "UPDATED_NEW"
+    });
+    return await runCommand(command);
+};
 
 const deletePost = async (id) => {
     const command = new DeleteCommand({
@@ -51,12 +67,13 @@ const deletePost = async (id) => {
         Key: { class: CLASS_POST, itemID: id }
     });
     return await runCommand(command);
-}
+};
 
 module.exports = {
     sendPost,
     sendReply,
     getPost,
     scanPosts,
+    updatePost,
     deletePost
 };

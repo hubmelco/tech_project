@@ -11,10 +11,7 @@ const createPost = async (username, text, score, title) => {
 }
 
 const createReply = async (username, text, id) => {
-    const post = await postDAO.getPost(id);
-    if (!post.Item) {
-        throw { status: 400, message: "That post doesn't exist" };
-    }
+    const post = await getPostById(id);
     const reply = [{ postedBy: username, description: text }];
     const data = await postDAO.sendReply(reply, id);
     throwIfError(data);
@@ -41,8 +38,14 @@ const seePosts = async () => {
     return posts.Items;
 }
 
-const updatePost = async (id, title, description, score) => {
-    const foundPost = await getPostById(id);
+const updatePost = async (id, title, score, description) => {
+    const post = await getPostById(id);
+    post.title = title ? title : post.title;
+    post.score = score ? score : post.score;
+    post.description = description ? description : post.description;
+
+    const updateResult = await postDAO.updatePost(post);
+    throwIfError(updateResult);
 };
 
 const deletePost = async (id) => {
