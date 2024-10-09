@@ -48,8 +48,8 @@ postRouter.patch("/:id", authenticate, async (req, res) => {
             if (flag !== undefined && (typeof(flag) !== "number" || (flag > 1 || flag < 0))) {
                 return res.status(400).json({message: "provided flag must be a number (0 or 1)"});
             }
-            const updates = await updatePost(id, post, {description: description, title: title, score: score, isFlagged: flag});
-            return res.status(200).json({id, post: updates});
+            const updated = await updatePost(id, post, {description: description, title: title, score: score, isFlagged: flag});
+            return res.status(200).json({id, updated});
         }
     } catch (err) {
         handleServiceError(err, res);
