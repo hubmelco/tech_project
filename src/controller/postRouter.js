@@ -41,7 +41,7 @@ postRouter.patch("/:id", authenticate, async (req, res) => {
             // Only get updatable fields from the body
             const {description, title, score} = req.body;
             if (description === undefined && title === undefined && score === undefined && flag === undefined) {
-                return res.status(400).json({message: "No updatable attributes provided. Must provide description, title, flag, or score in body"});
+                return res.status(400).json({message: "No updatable attributes provided. Must provide description, title, flag, or score in body (flag is not valid if you are the poster)"});
             }
             if (score && typeof(score) !== "number") {
                 return res.status(400).json({message: "provided score must be of type number"});
