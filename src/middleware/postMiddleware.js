@@ -2,7 +2,7 @@ const { validateBody } = require("../utilities/routerUtilities");
 const { isValidString } = require("../utilities/stringUtilities");
 
 function validateTitle(required = true) {
-    return validateBody("score", (title) => isValidString(title), required);
+    return validateBody("title", (title) => isValidString(title), required);
 }
 
 function validateScore(required = true) {
@@ -11,7 +11,7 @@ function validateScore(required = true) {
 }
 
 function validateTextBody(required = true) {
-    return validateBody("score", (text) => isValidString(text), required);
+    return validateBody("text", (text) => isValidString(text), required);
 }
 
 module.exports = {

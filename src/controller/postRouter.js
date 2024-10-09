@@ -47,7 +47,7 @@ postRouter.patch("/replies", authenticate, validateTextBody(), async (req, res) 
     }
 });
 
-postRouter.patch("/:postId", postOwnerAuthenticate, validateTitle(false), validateTextBody(false), validateScore(false),
+postRouter.patch("/:postId", postOwnerAuthenticate, validateTitle(false), validateScore(false), validateTextBody(false),
     async (req, res) => {
         const postId = req.params.postId;
         const { title, score, description } = req.body;

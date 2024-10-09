@@ -48,8 +48,13 @@ const postOwnerAuthenticate = async (req, res, next) => {
         const user = jwt.verify(token, process.env.JWT_SECRET);
 
         const postId = req.params.postId;
-        const post = await getPostById(postId);
-        const userId = (await getUserByUsername(post.postedBy)).itemID;
+        let userId;
+        try {
+            const post = await getPostById(postId);
+            userId = (await getUserByUsername(post.postedBy)).itemID;
+        } catch (err) {
+            return res.status(err.status).json({ message: err.message });
+        }
         if (userId !== user.itemID) {
             return res.status(401).json("Unauthorized Access - Wrong User");
         }
