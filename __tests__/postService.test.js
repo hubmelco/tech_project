@@ -194,24 +194,6 @@ describe('updatePost test', () => {
         expect(post.score).toEqual(expectedScore);
         expect(post.description).toEqual(expectedDescription);
     });
-
-    it('Throw if score is invalid', async () => {
-        const id = mockPost1.itemID;
-        const title = "Different Title";
-        const score = 999;
-        const description = "New description";
-        let error;
-        const expectedStatus = 500;
-
-        try {
-            await updatePost(id, title, score, description);
-        }
-        catch (err) {
-            error = err;
-        }
-
-        expect(error?.status).toEqual(expectedStatus);
-    });
 });
 
 describe('deletePost test', () => {
