@@ -42,6 +42,12 @@ postRouter.patch("/:id", authenticate, async (req, res) => {
             if (score && typeof(score) !== "number") {
                 return res.status(400).json({message: "provided score must be of type number"});
             }
+            if (description && typeof(description) !== "string") {
+                return res.status(400).json({message: "provided description must be of type string"});
+            }
+            if (title && typeof(title) !== "string") {
+                return res.status(400).json({message: "provided title must be of type string"});
+            }
             if (flag !== undefined && post.postedBy === user.username) {
                 flag = undefined; // Users and admins cannot flag/unflag their own post
             }
