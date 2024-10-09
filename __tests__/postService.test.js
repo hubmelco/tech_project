@@ -79,7 +79,7 @@ beforeAll(() => {
     postDAO.deletePost.mockImplementation(async (id) => {
         for (let i = 0; i < mockDatabase.length; i++) {
             if (mockDatabase[i].itemID == id) {
-                const data = mockDatabase.splice(i, 1);
+                mockDatabase.splice(i, 1);
                 return {
                     $metadata: {
                         httpStatusCode: 200
