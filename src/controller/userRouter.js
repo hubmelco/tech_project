@@ -1,13 +1,12 @@
 const express = require('express');
-const postService = require('../services/postService');
 const userService = require('../services/userService');
-const { validateUsername, validatePassword } = require('../middleware/userMiddleware');
+const userMiddleware = require('../middleware/userMiddleware');
 const {  authenticate, adminAuthenticate  } = require("../middleware/authMiddleware");
 const { handleServiceError } = require("../utilities/routerUtilities");
 
 const userRouter = express.Router();
 
-userRouter.post("/", validateUsername, validatePassword, async (req, res) => {
+userRouter.post("/", userMiddleware.validateUsername, userMiddleware.validatePassword, async (req, res) => {
     const { username, password } = req.body;
 
     try {
@@ -21,7 +20,7 @@ userRouter.post("/", validateUsername, validatePassword, async (req, res) => {
     }
 });
 
-userRouter.post("/login", validateUsername, validatePassword, async (req, res) => {
+userRouter.post("/login", userMiddleware.validateUsername, userMiddleware.validatePassword, async (req, res) => {
     const { username, password } = req.body;
 
     try {
@@ -61,25 +60,12 @@ userRouter.delete("/:id", adminAuthenticate, async (req, res) => {
     }
 });
 
-userRouter.patch("/:id/role", validateRole, adminAuthenticate, async (req, res) => {
+userRouter.patch("/:id/role", userMiddleware.validateRole, adminAuthenticate, async (req, res) => {
     const { id } = req.params;
     const { role } = req.body;
     try {
         await updateRole(id, role);
         return res.status(200).json({ message: `User role changed to ${role}` });
-    } catch (err) {
-        handleServiceError(err, res);
-    }
-});
-
-userRouter.patch("/:id/like", authenticate, validateLike, async (req, res) => {
-    //TODO check song title exists in API
-    try {
-        const like = await userService.addLike(req.body.like, req.params.id, res.locals.user.itemID);
-        await postService.checkLike(like, req.params.id);
-        res.status(200).json({
-            message: "Updated like/dislike ratio on post"
-        });
     } catch (err) {
         handleServiceError(err, res);
     }

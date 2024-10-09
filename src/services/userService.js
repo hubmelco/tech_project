@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const uuid = require("uuid");
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 const userDAO = require('../repository/userDAO');
 const { throwIfError } = require('../utilities/dynamoUtilities');
 
@@ -17,8 +17,6 @@ const register = async (username, password) => {
         itemID: uuid.v4(),
         username,
         password,
-        postsLiked: [],
-        postsDisliked: [],
         role: "user",
         bio: "",
         genres: []
@@ -39,7 +37,7 @@ const login = async (username, password) => {
 
     throw {
         status: 400,
-        message: "Invalid username/password"
+        message: "Invalid username or password"
     }
 }
 
@@ -110,44 +108,6 @@ const deleteUser = async (id) => {
     await userDAO.deleteUser(id);
 }
 
-const addLike = async (like, postID, userID) => {
-    const user = await userDAO.getUserById(userID);
-    throwIfError(user);
-    const dislikedList = user.Item.postsDisliked;
-    const likedList = user.Item.postsLiked;
-    if (like == 1){
-        if (likedList.includes(postID)){
-            throw {
-                status: 400,
-                message: "Post is already liked"
-            }
-        }
-        if (dislikedList.includes(postID)){
-            const data = await userDAO.removeDislike(dislikedList.indexOf(postID), userID);
-            throwIfError(data);
-            like = 2;
-        }
-        const result = await userDAO.updateLike(postID, userID);
-        throwIfError(result);
-    }
-    else{
-        if (dislikedList.includes(postID)){
-            throw {
-                status: 400,
-                message: "Post is already disliked"
-            }
-        }
-        if (likedList.includes(postID)){
-            const data = await userDAO.removeLike(likedList.indexOf(postID), userID);
-            throwIfError(data);
-            like = -2;
-        }
-        const result = await userDAO.updateDislike(postID, userID);
-        throwIfError(result);
-    }
-    return like;
-}
-
 function createToken(user) {
     // Delete unneccesarry attributes as needed here
     delete (user.password);
@@ -159,7 +119,6 @@ function createToken(user) {
 module.exports = {
     register,
     login,
-    addLike,
     updateRole,
     updateUser,
     deleteUser

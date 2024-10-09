@@ -16,8 +16,6 @@ const mockUser1 = {
     username: "user_1",
     password: "password1",
     role: "user",
-    postsLiked: [],
-    postsDisliked: [],
     bio: "bio1",
     genres: []
 };
@@ -27,8 +25,6 @@ const mockUser2 = {
     username: "user_2",
     password: "password1",
     role: "user",
-    postsLiked: [],
-    postsDisliked: [],
     bio: "bio2",
     genres: []
 };
@@ -38,8 +34,6 @@ const mockUser3 = {
     username: "user_3",
     password: "password1",
     role: "user",
-    postsLiked: [],
-    postsDisliked: [],
     bio: "bio3",
     genres: []
 };
@@ -49,8 +43,6 @@ const mockAdmin = {
     username: "admin_1",
     password: "password1",
     role: "admin",
-    postsLiked: [],
-    postsDisliked: []
 };
 
 beforeAll(() => {
@@ -121,50 +113,6 @@ beforeAll(() => {
         };
     });
 
-    userDAO.updateLike.mockImplementation((postID, userID) => {
-        const user = userDAO.getUserById(userID).Item;
-        user.postsLiked.push(postID);
-        mockDatabase.set(user.username, user);
-        return {
-            $metadata: {
-                httpStatusCode: 200
-            }
-        };
-    });
-
-    userDAO.updateDislike.mockImplementation((postID, userID) => {
-        const user = userDAO.getUserById(userID).Item;
-        user.postsDisliked.push(postID);
-        mockDatabase.set(user.username, user);
-        return {
-            $metadata: {
-                httpStatusCode: 200
-            }
-        };
-    });
-
-    userDAO.removeLike.mockImplementation((postID, userID) => {
-        const user = userDAO.getUserById(userID).Item;
-        user.postsLiked.splice(user.postsLiked.indexOf(postID), 1);
-        mockDatabase.set(user.username, user);
-        return {
-            $metadata: {
-                httpStatusCode: 200
-            }
-        };
-    });
-
-    userDAO.removeDislike.mockImplementation((postID, userID) => {
-        const user = userDAO.getUserById(userID).Item;
-        user.postsDisliked.splice(user.postsDisliked.indexOf(postID), 1);
-        mockDatabase.set(user.username, user);
-        return {
-            $metadata: {
-                httpStatusCode: 200
-            }
-        };
-    });
-
     userDAO.updateUser.mockImplementation((id, requestBody) => {
         const user = userDAO.getUserById(id).Item;
         const oldUsername = user.username;
@@ -199,10 +147,6 @@ beforeEach(() => {
     userDAO.putUser.mockClear();
     userDAO.queryByUsername.mockClear();
     userDAO.getUserById.mockClear();
-    userDAO.updateLike.mockClear();
-    userDAO.updateDislike.mockClear();
-    userDAO.removeLike.mockClear();
-    userDAO.removeDislike.mockClear();
     userDAO.updateUser.mockClear();
 });
 
@@ -397,54 +341,4 @@ describe("Change User Role", () => {
         expect(error.status).toEqual(400);
     });
 
-});
-
-describe("Likes/dislikes", () => {
-    test("User likes post", async () => {
-        const userID = mockUser1.itemID;
-        const postID = "whatever";
-        const like = 1;
-
-        await addLike(like, postID, userID);
-        let likeAdded = false;
-        mockDatabase.forEach((user) => {
-            if (user.postsLiked.includes(postID) && !user.postsDisliked.includes(postID)) {
-                likeAdded = true;
-            }
-        });
-
-        expect(likeAdded).toBeTruthy();
-    });
-
-    test("User dislikes same post", async () => {
-        const userID = mockUser1.itemID;
-        const postID = "whatever";
-        const like = -1;
-
-        await addLike(like, postID, userID);
-        let dislikeAdded = false;
-        mockDatabase.forEach((user) => {
-            if (user.postsDisliked.includes(postID) && !user.postsLiked.includes(postID)) {
-                dislikeAdded = true;
-            }
-        });
-
-        expect(dislikeAdded).toBeTruthy();
-    });
-
-    test("User re-likes same post", async () => {
-        const userID = mockUser1.itemID;
-        const postID = "whatever";
-        const like = 1;
-
-        await addLike(like, postID, userID);
-        let likeAdded = false;
-        mockDatabase.forEach((user) => {
-            if (user.postsLiked.includes(postID) && !user.postsDisliked.includes(postID)) {
-                likeAdded = true;
-            }
-        });
-
-        expect(likeAdded).toBeTruthy();
-    });
 });

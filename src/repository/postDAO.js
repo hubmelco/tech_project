@@ -19,7 +19,7 @@ async function scanPosts() {
         ExpressionAttributeValues: {
             ":class": CLASS_POST
         }
-    })
+    });
     const response = await runCommand(command);
     return response;
 }
@@ -50,9 +50,19 @@ async function sendLike(like, id){
         TableName,
         Key: {"class": CLASS_POST, "itemID": id},
         ExpressionAttributeValues: {
-            ":r": like
+            ":r": [like]
         },
-        UpdateExpression: "ADD likes :r",
+        UpdateExpression: "SET likedBy = list_append(likedBy, :r)",
+        ReturnValues: "UPDATED_NEW"
+    });
+    return await runCommand(command);
+}
+
+async function removeLike(index, id){
+    const command = new UpdateCommand({
+        TableName,
+        Key: {"class": CLASS_POST, "itemID": id},
+        UpdateExpression: "REMOVE likedBy["+index+"]",
         ReturnValues: "UPDATED_NEW"
     });
     return await runCommand(command);
@@ -63,5 +73,6 @@ module.exports = {
     scanPosts,
     sendReply,
     getPost,
-    sendLike
+    sendLike,
+    removeLike
 };

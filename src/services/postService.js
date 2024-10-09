@@ -1,10 +1,10 @@
 const { throwIfError } = require('../utilities/dynamoUtilities');
 const postDAO = require("../repository/postDAO");
 const uuid = require("uuid");
-const userDAO = require("../repository/userDAO");
 
-async function createPost(username, text, score, title){
-    const post = {class: "post", itemID: uuid.v4(), postedBy: username, description: text, score, title, replies: [], likes: 0};
+
+async function createPost(userID, text, score, title){
+    const post = {class: "post", itemID: uuid.v4(), postedBy: userID, description: text, score, title, replies: [], likedBy: []};
     const data = await postDAO.sendPost(post);
     throwIfError(data);
     return post;
@@ -16,23 +16,39 @@ async function seePosts(){
     return posts.Items;
 }
 
-async function createReply(username, text, id){
+async function createReply(userID, text, id){
     const post = await postDAO.getPost(id);
     if (!post.Item) {
-        throw {status: 400, message: "That post doesn't exist"};
+        throw {status: 400, message: `Post ${id} doesn't exist`};
     }
-    const reply = {postedBy: username, description: text};
+    const reply = {postedBy: userID, description: text};
     const data = await postDAO.sendReply(reply, id);
     throwIfError(data);
     return reply;
 }
 
-async function checkLike(like, postID){
+async function checkLike(like, postID, userID){
+    const userLike = {userID, like};
     const post = await postDAO.getPost(postID);
     if (!post.Item) {
-        throw {status: 400, message: "That post doesn't exist"};
+        throw {status: 400, message: `Post ${postID} doesn't exist`};
     }
-    const postData = await postDAO.sendLike(like, postID);
+    const likeList = post.Item.likedBy;
+    for (let i = 0; i < likeList.length; i++){
+        if (likeList[i].userID == userID){
+            if (likeList[i].like == like){
+                if (like == 1){
+                    throw {status: 400, message: `You already liked post ${postID}`};
+                }
+                throw {status: 400, message: `You already disliked post ${postID}`};
+            }
+            //Remember to have frontend update like/dislike because you changed your mind
+            const data = await postDAO.removeLike(i, postID);
+            throwIfError(data);
+            break;
+        }
+    }
+    const postData = await postDAO.sendLike(userLike, postID);
     throwIfError(postData);
     return postData;
 }

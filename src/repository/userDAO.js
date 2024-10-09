@@ -90,64 +90,6 @@ const deleteUser = async (id) => {
     await runCommand(command);
 }
 
-async function updateLike(postID, userID){
-    const command = new UpdateCommand({
-        TableName,
-        Key: {
-            class: CLASS_USER,
-            itemID: userID
-        },
-        ExpressionAttributeValues: {
-            ":post": [postID]
-        },
-        UpdateExpression: "SET postsLiked = list_append(postsLiked, :post)",
-        ReturnValues: "UPDATED_NEW"
-    });
-    return await runCommand(command);
-}
-
-async function updateDislike(postID, userID){
-    const command = new UpdateCommand({
-        TableName,
-        Key: {
-            class: CLASS_USER,
-            itemID: userID
-        },
-        ExpressionAttributeValues: {
-            ":post": [postID]
-        },
-        UpdateExpression: "SET postsDisliked = list_append(postsDisliked, :post)",
-        ReturnValues: "UPDATED_NEW"
-    });
-    return await runCommand(command);
-}
-
-async function removeLike(index, userID){
-    const command = new UpdateCommand({
-        TableName,
-        Key: {
-            class: CLASS_USER,
-            itemID: userID
-        },
-        UpdateExpression: "REMOVE postsLiked["+index+"]",
-        ReturnValues: "UPDATED_NEW"
-    });
-    return await runCommand(command);
-}
-
-async function removeDislike(index, userID){
-    const command = new UpdateCommand({
-        TableName,
-        Key: {
-            class: CLASS_USER,
-            itemID: userID
-        },
-        UpdateExpression: "REMOVE postsDisliked["+index+"]",
-        ReturnValues: "UPDATED_NEW"
-    });
-    return await runCommand(command);
-}
-
 module.exports = {
     putUser,
     queryByUsername,
@@ -156,8 +98,4 @@ module.exports = {
     getUserById,
     updateRole,
     deleteUser,
-    updateLike,
-    updateDislike,
-    removeLike,
-    removeDislike
 };
