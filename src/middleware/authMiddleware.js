@@ -1,4 +1,6 @@
 const jwt = require("jsonwebtoken");
+const { getPostById } = require("../services/postService");
+const { getUserByUsername } = require("../services/userService");
 
 const authenticate = (req, res, next) => {
     const token = getToken(req);
