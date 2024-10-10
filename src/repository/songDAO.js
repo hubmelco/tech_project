@@ -24,12 +24,13 @@ async function getSongs(query, type, offset, retries = 0) {
         // Recursive call stopper
         throw {status: 502, message: "Unable to search"}
     }
-    
+
     let q = new buildQ();
     for (const key in query) {
         q.addQuery(key, query[key]);
     }
     q = q.build();
+
     const response = await fetch(`https://api.spotify.com/v1/search?q=${q}&type=${type}&market=US&offset=${offset}`, {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + token },
@@ -46,19 +47,19 @@ async function getSongs(query, type, offset, retries = 0) {
     }
     const {tracks} = json;
     const filtered = tracks.items.map((item) => {
+        const artists = item.artists.map((artist) => {
+            return {id: artist.id, name: artist.name, url: artist.external_urls.spotify}
+        })
         return {
             spotifyId: item.id,
             name: item.name,
             link: item.external_urls.spotify,
             popularity: item.popularity,
             image: item.album.images[1].url,
-            artist: {
-                id: item.artists[0].id,
-                name: item.artists[0].name
-            }
+            artists
         }
     });
-    // const previous = constructNextPageURL(query, offset, type); 
+    // const previous = constructNextPageURL(query, offset - limit, type); 
     // Can maybe return above line to go back to previous search, 
     // maybe check if offset > limit before having this to ensure there is a previous
     const total = tracks.total - offset;
@@ -98,7 +99,6 @@ class buildQ {
     }
 
     build() {
-        console.log(this.q);
         return this.q;
     }
 }

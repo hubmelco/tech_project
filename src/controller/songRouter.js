@@ -21,8 +21,8 @@ router.get("/", async (req, res) => {
     
     if (offset) {
         offset = parseInt(offset); // returns NaN if fails
-        if (!offset && offset !== 0) {
-            return res.status(400).json({message: "Offset must be a number"});
+        if ((!offset && offset !== 0) || offset < 0) {
+            return res.status(400).json({message: "Offset must be a number and non negative"});
         }
     }
 
