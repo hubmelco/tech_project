@@ -11,7 +11,8 @@ const mockPost1 = {
     score: 50,
     title: "Title",
     replies: [],
-    likedBy: []
+    likedBy: [],
+    tags: []
 };
 const mockPost2 = {
     class: "post",
@@ -21,7 +22,8 @@ const mockPost2 = {
     score: 100,
     title: "Title",
     replies: [],
-    likedBy: []
+    likedBy: [],
+    tags: []
 };
 
 beforeAll(() => {

@@ -4,7 +4,7 @@ const uuid = require("uuid");
 
 
 async function createPost(userID, text, score, title){
-    const post = {class: "post", itemID: uuid.v4(), postedBy: userID, description: text, score, title, replies: [], likedBy: []};
+    const post = {class: "post", itemID: uuid.v4(), postedBy: userID, description: text, score, title, replies: [], likedBy: [], tags: []};
     const data = await postDAO.sendPost(post);
     throwIfError(data);
     return post;
