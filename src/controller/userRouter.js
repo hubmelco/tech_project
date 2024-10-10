@@ -1,6 +1,6 @@
 const express = require('express');
 const userService = require('../services/userService');
-const { validateUsername, validatePassword } = require('../middleware/userMiddleware');
+const { validateUsername, validatePassword, validateRole } = require('../middleware/userMiddleware');
 const {  authenticate, adminAuthenticate  } = require("../middleware/authMiddleware");
 const { handleServiceError } = require("../utilities/routerUtilities");
 
