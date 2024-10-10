@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
+    "stop":"taskkill -f -t -im node*",
     "test": "jest",
     "dev": "nodemon src/index.js"
   },
