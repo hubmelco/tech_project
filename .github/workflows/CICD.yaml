@@ -4,6 +4,10 @@
 name: Revature Tech Project CI CD
 
 on:
+  push: 
+    branches:
+      - "main"
+      - "dev"
   pull_request: # Only runs on types [opened, reopened, synchronize]. Synchronize catches any updates made to a PR
     branches: 
       - "main"
