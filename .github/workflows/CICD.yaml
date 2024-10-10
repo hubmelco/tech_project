@@ -4,17 +4,14 @@
 name: Revature Tech Project CI CD
 
 on:
-  push:
-  pull_request:
+  pull_request: # Only runs on types [opened, reopened, synchronize]. Synchronize catches any updates made to a PR
     branches: 
       - "main"
       - "dev"
 
 jobs:
   run-tests:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js 20.x
