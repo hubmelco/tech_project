@@ -16,7 +16,7 @@ async function getToken() {
       return access_token;
 }
 
-async function getSong(query, type, offset, retries = 0) {
+async function getSongs(query, type, offset, retries = 0) {
     if (!token) {
         token = await getToken();
     }
@@ -103,4 +103,4 @@ class buildQ {
     }
 }
 
-module.exports = {getSong};
+module.exports = {getSongs};

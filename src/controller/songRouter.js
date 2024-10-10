@@ -1,6 +1,6 @@
 const express = require("express");
 
-const {getSong} = require("../services/songService");
+const {getSongs} = require("../services/songService");
 
 const router = express.Router();
 
@@ -27,9 +27,10 @@ router.get("/", async (req, res) => {
     }
 
     try {
-        const {showMore, songs} = await getSong({track, artist, year, genre, album}, type, offset);
+        const {showMore, songs} = await getSongs({track, artist, year, genre, album}, type, offset);
         res.status(200).json({showMore, songs});
     } catch (err) {
+        console.log(err);
         res.status(502).json({message: "The server was acting as a gateway or proxy and received an invalid response from the upstream server"});
     }
 })
