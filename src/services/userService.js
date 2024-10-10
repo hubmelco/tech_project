@@ -25,7 +25,7 @@ const register = async (username, password) => {
     throwIfError(result);
     delete (user.password);
     return user;
-}
+};
 
 const login = async (username, password) => {
     const result = await userDAO.queryByUsername(username);
@@ -39,7 +39,21 @@ const login = async (username, password) => {
         status: 400,
         message: "Invalid username/password"
     }
-}
+};
+
+const getUserById = async (userId) => {
+    const result = await userDAO.getUserById(userId);
+    throwIfError(result);
+    const foundUser = result?.Item;
+    return foundUser;
+};
+
+const getUserByUsername = async (username) => {
+    const result = await userDAO.queryByUsername(username);
+    throwIfError(result);
+    const foundUser = result?.Items[0];
+    return foundUser;
+};
 
 const updateRole = async (id, role) => {
     const getUserResult = await userDAO.getUserById(id);
@@ -68,16 +82,9 @@ const updateRole = async (id, role) => {
     const updateResult = await userDAO.updateRole(id, role);
     throwIfError(updateResult);
     return updateResult;
-}
+};
 
-async function getUserById(userId) {
-    const result = await userDAO.getUserById(userId);
-    throwIfError(result);
-    const foundUser = result?.Item;
-    return foundUser;
-}
-
-async function updateUser(userId, requestBody) {
+const updateUser = async (userId, requestBody) => {
     const foundUser = await getUserById(userId);
 
     if (!foundUser) {
@@ -101,12 +108,12 @@ async function updateUser(userId, requestBody) {
     throwIfError(result);
     const updatedUser = result?.Attributes;
     return updatedUser;
-}
+};
 
 const deleteUser = async (id) => {
     // Maybe add user exist check here, but not needed since dynamo wont error out with a not found id
     await userDAO.deleteUser(id);
-}
+};
 
 function createToken(user) {
     // Delete unneccesarry attributes as needed here
@@ -119,6 +126,8 @@ function createToken(user) {
 module.exports = {
     register,
     login,
+    getUserById,
+    getUserByUsername,
     updateRole,
     updateUser,
     deleteUser

@@ -1,10 +1,11 @@
-const { createPost, createReply } = require("../src/services/postService");
+const { createPost, createReply, getPostById, updatePost, deletePost } = require("../src/services/postService");
 const postDAO = require("../src/repository/postDAO");
+const { CLASS_POST } = require("../src/utilities/dynamoUtilities");
 
 jest.mock('../src/repository/postDAO');
 let mockDatabase = [];
 const mockPost1 = {
-    class: "post",
+    class: CLASS_POST,
     itemID: "e7b1998e-77d3-4cad-9955-f20135d840d0",
     postedBy: "user_1",
     description: "Hello world",
@@ -13,7 +14,7 @@ const mockPost1 = {
     replies: []
 };
 const mockPost2 = {
-    class: "post",
+    class: CLASS_POST,
     itemID: "29ee2056-c74e-4537-ac95-6234a2506426",
     postedBy: "user_2",
     description: "This is a great song",
@@ -33,22 +34,52 @@ beforeAll(() => {
         };
     });
     postDAO.getPost.mockImplementation(async (id) => {
-        for (let i = 0; i < mockDatabase.length; i++){
-            if (mockDatabase[i].itemID == id){
+        for (let i = 0; i < mockDatabase.length; i++) {
+            if (mockDatabase[i].itemID == id) {
                 return {
                     $metadata: {
                         httpStatusCode: 200
                     },
-                    Item: mockPost1
+                    Item: mockDatabase[i]
+                };
+            } else {
+                return {
+                    $metadata: {
+                        httpStatusCode: 400
+                    }
                 };
             }
         }
         return false;
     });
     postDAO.sendReply.mockImplementation(async (reply, id) => {
-        for (let i = 0; i < mockDatabase.length; i++){
-            if (mockDatabase[i].itemID == id){
+        for (let i = 0; i < mockDatabase.length; i++) {
+            if (mockDatabase[i].itemID == id) {
                 mockDatabase[i].replies.push(reply);
+                return {
+                    $metadata: {
+                        httpStatusCode: 200
+                    }
+                };
+            }
+        }
+    });
+    postDAO.updatePost.mockImplementation(async (post) => {
+        for (let i = 0; i < mockDatabase.length; i++) {
+            if (mockDatabase[i].itemID == post.itemID) {
+                mockDatabase[i] = post;
+                return {
+                    $metadata: {
+                        httpStatusCode: 200
+                    }
+                };
+            }
+        }
+    });
+    postDAO.deletePost.mockImplementation(async (id) => {
+        for (let i = 0; i < mockDatabase.length; i++) {
+            if (mockDatabase[i].itemID == id) {
+                mockDatabase.splice(i, 1);
                 return {
                     $metadata: {
                         httpStatusCode: 200
@@ -62,9 +93,13 @@ beforeAll(() => {
 beforeEach(() => {
     // Reset database
     mockDatabase = [];
-    mockDatabase.push(mockPost1);
-    mockDatabase.push(mockPost2);
+    mockDatabase.push(structuredClone(mockPost1));
+    mockDatabase.push(structuredClone(mockPost2));
     postDAO.sendPost.mockClear();
+    postDAO.getPost.mockClear();
+    postDAO.sendReply.mockClear();
+    postDAO.updatePost.mockClear();
+    postDAO.deletePost.mockClear();
 });
 
 describe('createPost test', () => {
@@ -94,10 +129,83 @@ describe('createReply test', () => {
         const response = await createReply(username, text, id);
         let added = false;
         mockDatabase.forEach((post) => {
-            if(post.itemID == id && post.replies.length > 0){
+            if (post.itemID == id && post.replies.length > 0) {
                 added = true;
             }
         });
         expect(added).toBeTruthy();
+    });
+});
+
+describe('getPostById', () => {
+    it('Successful get post', async () => {
+        const id = mockPost1.itemID;
+        const expectedDescription = mockPost1.description;
+
+        const post = await getPostById(id);
+
+        expect(post.itemID).toEqual(id);
+        expect(post.description).toEqual(expectedDescription);
+    });
+
+    it('Throws if post not found', async () => {
+        const id = "FakeID";
+        let error;
+        const expectedStatus = 500;
+
+        try {
+            await getPostById(id);
+        }
+        catch (err) {
+            error = err;
+        }
+
+        expect(error?.status).toEqual(expectedStatus);
+    });
+})
+
+describe('updatePost test', () => {
+    it('Successful update post', async () => {
+        const id = mockPost1.itemID;
+        const title = "Different Title";
+        const score = 28;
+        const description = "New description";
+
+        await updatePost(id, title, score, description);
+        const post = (await postDAO.getPost(id)).Item;
+
+        expect(post.title).toEqual(title);
+        expect(post.score).toEqual(score);
+        expect(post.description).toEqual(description);
+    });
+
+    it('Update only the title', async () => {
+        const id = mockPost1.itemID;
+        const title = "Another Different Title";
+        const score = undefined;
+        const description = undefined;
+        const expectedScore = mockPost1.score;
+        const expectedDescription = mockPost1.description;
+
+        await updatePost(id, title, score, description);
+        const post = (await postDAO.getPost(id)).Item;
+
+        expect(post.title).toEqual(title);
+        expect(post.score).toEqual(expectedScore);
+        expect(post.description).toEqual(expectedDescription);
+    });
+});
+
+describe('deletePost test', () => {
+    it('Successful delete post', async () => {
+        const id = mockPost1.itemID;
+        const expectedStatus = 400;
+        const expectedPosts = mockDatabase.length - 1;
+
+        await deletePost(id);
+        const statusCode = (await postDAO.getPost(id)).$metadata.httpStatusCode;
+
+        expect(statusCode).toEqual(expectedStatus);
+        expect(mockDatabase.length).toEqual(expectedPosts);
     });
 });
