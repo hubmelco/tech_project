@@ -67,6 +67,10 @@ beforeEach(() => {
     postDAO.sendPost.mockClear();
 });
 
+it("Break tests", () => {
+    expect(false).toBeTruthy();
+});
+
 describe('createPost test', () => {
     it('Successful post creation', async () => {
         const username = "Sam";
