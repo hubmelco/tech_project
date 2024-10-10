@@ -5,24 +5,30 @@ const {getSong} = require("../services/songService");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-    const {song, artist, type} = req.query;
+    const {track, artist, year, genre, album, type} = req.query;
     let {offset} = req.query;
-    if (!type || (type !== "album" && type !== "track")) {
-        return res.status(400).json("type must be provided. must be 'album' or 'track'");
+    if (!type || (type !== "album" && type !== "track" && type !== "artist")) {
+        return res.status(400).json("type must be provided. must be 'album', 'track', or 'artist'");
     }
-    if (!song && !artist) {
-        return res.status(400).json({message: "A song or artist must be provided through query params"});
+
+    if (type === "album" && !artist && !year && !album) {
+        return res.status(400).json({message: "An artist, year, or album must be provided through query params for type 'album'"});
+    } else if (type === "track" && !track && !artist && !year && !genre && !album) {
+        return res.status(400).json({message: "A track, artist, year, album, or genre must be provided through query params for type 'track'"});
+    } else if (type === "artist" && !artist && !year && !genre) {
+        return res.status(400).json({message: "An artist, year, or genre must be provided through query params for type 'artist'"});
     }
+    
     if (offset) {
-        offset = parseInt(offset);
-        // Defined but not a number
-        if (!offset) {
+        offset = parseInt(offset); // returns NaN if fails
+        if (!offset && offset !== 0) {
             return res.status(400).json({message: "Offset must be a number"});
         }
     }
+
     try {
-        const songs = await getSong(song, artist, type, offset);
-        res.status(200).json(songs);
+        const {showMore, songs} = await getSong({track, artist, year, genre, album}, type, offset);
+        res.status(200).json({showMore, songs});
     } catch (err) {
         res.status(502).json({message: "The server was acting as a gateway or proxy and received an invalid response from the upstream server"});
     }

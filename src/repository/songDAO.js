@@ -16,30 +16,35 @@ async function getToken() {
       return access_token;
 }
 
-async function getSong(title, artist, type, offset, retries = 0) {
+async function getSong(query, type, offset, retries = 0) {
     if (!token) {
         token = await getToken();
     }
     if (retries === 2) {
         // Recursive call stopper
-        throw {status: 502, message: "Unable to search for songs"}
+        throw {status: 502, message: "Unable to search"}
     }
-    const q = buildQ(title, artist)
+    
+    let q = new buildQ();
+    for (const key in query) {
+        q.addQuery(key, query[key]);
+    }
+    q = q.build();
     const response = await fetch(`https://api.spotify.com/v1/search?q=${q}&type=${type}&market=US&offset=${offset}`, {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + token },
     });
-    if (response.error) {
-        const {status} = response.error;
+    const json = await response.json();
+    if (json.error) {
+        const {status} = json.error;
         if (status !== 401) {
-            throw response.error;
+            throw json.error;
         }
         // 401 means token expired so retry method after getting a new token
         token = await getToken();
         return await getSong(retries+1);
     }
-    const {tracks} = await response.json();
-    console.log("Next Paginated call", tracks.next);
+    const {tracks} = json;
     const filtered = tracks.items.map((item) => {
         return {
             spotifyId: item.id,
@@ -53,19 +58,49 @@ async function getSong(title, artist, type, offset, retries = 0) {
             }
         }
     });
-    return filtered;
+    // const previous = constructNextPageURL(query, offset, type); 
+    // Can maybe return above line to go back to previous search, 
+    // maybe check if offset > limit before having this to ensure there is a previous
+    const total = tracks.total - offset;
+    offset = tracks.next ? offset + (total - (total - tracks.limit)) : null;
+    const next = constructNextPageURL(query, offset, type);
+    return {showMore: next, songs: filtered};
 }
 
-function buildQ(title, artist) {
-    let q = "";
-    if (title && !artist) {
-        q = `track%3A${title}`;
-    } else if (artist && !title) {
-        q = `artist%3A${artist}`;
-    } else {
-        q = `track%3A${title}+artist%3A${artist}`
+function constructNextPageURL(query, offset, type) {
+    if (offset === null) {
+        return "";
     }
-    return q;
+    let url = `http://localhost:3000/songs?type=${type}`;
+    for (const key in query) {
+        if (query[key] !== undefined) {
+            url += `&${key}=${query[key]}`;
+        }
+    }
+    url+=`offset=${offset}`;
+    return url;
+}
+
+class buildQ {
+    constructor() {
+        this.q = "";
+    }
+
+    addQuery(key, value) {
+        if (value !== undefined) {
+            if (this.q) {
+                this.q += `+${key}%3A${value}`;
+            } else {
+                this.q += `${key}%3A${value}`
+            }
+        }
+        return this;
+    }
+
+    build() {
+        console.log(this.q);
+        return this.q;
+    }
 }
 
 module.exports = {getSong};
