@@ -19,7 +19,6 @@ async function getPostById(id) {
             message: "Post not found"
         }
     }
-
     return foundPost;
 }
 
@@ -40,15 +39,24 @@ async function createReply(userId, postId, text){
     return reply;
 }
 
+async function getReply(postId, replyId) {
+    const repliesOfPost = await getRepliesOfPost(postId);
+    const foundReply = repliesOfPost.find((reply) => reply.itemID === replyId);
+    if (!foundReply) {
+        throw { status: 400, message: "That reply doesn't exist" }
+    }
+    return foundReply;
+}
+
 async function getRepliesOfPost(postId) {
     const foundPost = await getPostById(postId);
     return foundPost.replies;
 }
 
-async function deletePost(id) {
-    await getPostById(id);
+async function deletePost(postId) {
+    await getPostById(postId);
 
-    const deleteResult = await postDAO.deletePost(id);
+    const deleteResult = await postDAO.deletePost(postId);
     throwIfError(deleteResult);
 }
 
@@ -67,8 +75,10 @@ async function deleteReply(postId, replyId) {
 
 module.exports = {
     createPost,
-    createReply,
     seePosts,
+    getPostById,
+    createReply,
+    getReply,
     deletePost,
     deleteReply
 };

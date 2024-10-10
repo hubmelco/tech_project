@@ -60,10 +60,10 @@ async function getPost(id) {
     return await runCommand(command);
 }
 
-async function deletePost(id) {
+async function deletePost(postId) {
     const command = new DeleteCommand({
         TableName,
-        Key: { class: CLASS, itemID: id }
+        Key: { class: CLASS, itemID: postId }
     });
     return await runCommand(command);
 }

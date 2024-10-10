@@ -1,5 +1,5 @@
 const express = require('express');
-const { createPost, createReply, seePosts, deletePost, deleteReply } = require('../services/postService');
+const { createPost, createReply, getPostById, seePosts, getReply, deletePost, deleteReply } = require('../services/postService');
 const { handleServiceError } = require('../utilities/routerUtilities');
 const { authenticate } = require("../middleware/authMiddleware");
 const { validateTextBody, validateScore } = require('../middleware/postMiddleware');
@@ -49,11 +49,18 @@ postRouter.patch("/:postId/replies", authenticate, validateTextBody, async (req,
     }
 });
 
-postRouter.delete("/:id", authenticate, async (req, res) => {
-    const { id } = req.params;
+postRouter.delete("/:postId", authenticate, async (req, res) => {
+    const { postId } = req.params;
+    const userId = res.locals.user.itemID;
+    const role = res.locals.user.role;
+
     try {
-        await deletePost(id);
-        return res.status(200).json({ message: "Deleted post", data: id });
+        const foundPost = await getPostById(postId);
+        if (!(foundPost.postedBy === userId || role === "admin")) {
+            return res.status(400).json({ message: "Unauthorized access - wrong user or not admin" });
+        }
+        await deletePost(postId);
+        res.status(200).json({ message: "Deleted post", data: postId });
     } catch (err) {
         handleServiceError(err, res);
     }
@@ -61,10 +68,16 @@ postRouter.delete("/:id", authenticate, async (req, res) => {
 
 postRouter.delete("/:postId/replies/:replyId", authenticate, async (req, res) => {
     const { postId, replyId } = req.params;
+    const userId = res.locals.user.itemID;
+    const role = res.locals.user.role;
 
     try {
+        const foundReply = await getReply(postId, replyId);
+        if (!(foundReply.postedBy === userId || role === "admin")) {
+            return res.status(400).json({ message: "Unauthorized access - wrong user or not admin" });
+        }
         await deleteReply(postId, replyId);
-        return res.status(200).json({ message: "Deleted reply" });
+        res.status(200).json({ message: "Deleted reply" });
     } catch (err) {
         handleServiceError(err, res);
     }
